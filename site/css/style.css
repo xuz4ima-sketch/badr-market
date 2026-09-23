@@ -343,6 +343,36 @@ h3 {
 .hero-text > :nth-child(4) { animation-delay: 500ms; }
 .hero-logo { animation: logo-in 1100ms var(--ease) 200ms both; }
 
+/* Headline: words rise out of a mask one by one, then «сердца!» gets underlined */
+.hero-text > .h1-anim { animation: none; }
+.h1-anim .w {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.h1-anim .w > span {
+  display: inline-block;
+  animation: word-rise 900ms var(--ease) both;
+}
+.h1-anim .w:nth-child(1) > span { animation-delay: 150ms; }
+.h1-anim .w:nth-child(2) > span { animation-delay: 260ms; }
+.h1-anim .w:nth-child(3) > span { animation-delay: 370ms; }
+.h1-anim .w:nth-child(4) > span { animation-delay: 480ms; }
+.h1-anim .accent { position: relative; }
+.h1-anim .accent::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0.35em;
+  bottom: 0.02em;
+  height: 0.07em;
+  background: currentColor;
+  transform-origin: left;
+  animation: underline-draw 700ms var(--ease) 1250ms both;
+}
+
 .hero-body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -873,7 +903,7 @@ tr.is-out .c-opt { color: var(--muted); font-weight: 400; }
 }
 .order-items li {
   display: grid;
-  grid-template-columns: 3ch minmax(0, 1fr) auto 44px;
+  grid-template-columns: 3ch minmax(0, 1fr) auto 10ch 44px;
   align-items: center;
   column-gap: 12px;
   padding: 6px 0;
@@ -886,8 +916,12 @@ tr.is-out .c-opt { color: var(--muted); font-weight: 400; }
   color: var(--soft);
   font-variant-numeric: tabular-nums;
 }
-.order-items .oi-sum { white-space: nowrap; font-weight: 600; font-variant-numeric: tabular-nums; }
+.order-items .oi-text { display: flex; flex-direction: column; }
+.order-items .oi-price { color: var(--soft); font-size: 13px; }
+.order-items .oi-sum { white-space: nowrap; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
 .order-items .icon-btn { border-color: transparent; }
+.order-items .stepper { animation: none; border-color: var(--rule); }
+.order-items .stepper input { border-color: var(--rule); }
 
 .order-note { margin: 16px 0 0; color: var(--soft); font-size: 14px; }
 .order-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
@@ -898,15 +932,17 @@ tr.is-out .c-opt { color: var(--muted); font-weight: 400; }
   .order-send { flex: 1 1 100%; }
   .order-send .btn { flex: 1 1 0; padding: 0 10px; }
   .order-items li {
-    grid-template-columns: 3ch minmax(0, 1fr) 44px;
-    grid-template-areas: "n text rm" ". sum rm";
-    row-gap: 2px;
-    align-items: start;
+    grid-template-columns: 3ch auto minmax(0, 1fr) 44px;
+    grid-template-areas: "n text text rm" ". step sum rm";
+    row-gap: 8px;
+    align-items: center;
+    padding: 10px 0;
   }
-  .order-items li::before { grid-area: n; }
+  .order-items li::before { grid-area: n; align-self: start; }
   .order-items .oi-text { grid-area: text; }
+  .order-items .stepper { grid-area: step; }
   .order-items .oi-sum { grid-area: sum; }
-  .order-items .icon-btn { grid-area: rm; align-self: center; }
+  .order-items li > .icon-btn { grid-area: rm; align-self: start; }
 }
 
 @media (max-width: 1023px) {
@@ -975,6 +1011,14 @@ tr.is-out .c-opt { color: var(--muted); font-weight: 400; }
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: none; }
+}
+@keyframes word-rise {
+  from { opacity: 0; transform: translateY(105%) rotate(4deg); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes underline-draw {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 @keyframes drop-in {
   from { opacity: 0; transform: translateY(-100%); }

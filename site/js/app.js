@@ -534,8 +534,19 @@
     const n = lines.length;
     $("#order-sum").textContent = `Корзина: ${n} ${plural(n, ["позиция", "позиции", "позиций"])} на ${rub(total)}`;
 
-    $("#order-items").replaceChildren(...lines.map(({ item, q }) => el("li", null,
-      el("span", { class: "oi-text", text: `${item.display} — ${q} ${item.unit}${item.opt != null ? " × " + rub(item.opt) : ""}` }),
+    $("#order-items").replaceChildren(...lines.map(({ item, q }) => el("li", { "data-key": item.key },
+      el("span", { class: "oi-text" },
+        el("span", { text: item.display }),
+        el("span", { class: "oi-price", text: item.opt != null ? `${rub(item.opt)} / ${item.unit}` : "цена по запросу" }),
+      ),
+      el("div", { class: "stepper" },
+        el("button", { type: "button", class: "icon-btn", "data-act": "dec", "aria-label": `Уменьшить количество: ${item.display}` }, icon("minus")),
+        el("input", {
+          type: "number", inputmode: "numeric", min: "0", max: String(MAX_QTY), value: String(q),
+          "data-act": "qty", "aria-label": `Количество: ${item.display}`,
+        }),
+        el("button", { type: "button", class: "icon-btn", "data-act": "inc", "aria-label": `Увеличить количество: ${item.display}` }, icon("plus")),
+      ),
       el("span", { class: "oi-sum", text: item.opt != null ? rub(item.opt * q) : "по запросу" }),
       el("button", { type: "button", class: "icon-btn", "data-remove": item.key, "aria-label": `Убрать из корзины: ${item.display}` }, icon("x")),
     )));
@@ -682,11 +693,37 @@
       setOrderOpen($("#order-toggle").getAttribute("aria-expanded") !== "true");
     });
 
+    // The cart list is re-rendered on every change, so put focus back on the same control afterwards.
+    function setCartQty(key, value, act) {
+      setQty(key, value);
+      const target = act && [...$("#order-items").children]
+        .find((li) => li.dataset.key === key)?.querySelector(`[data-act="${act}"]`);
+      if (target) target.focus();
+      else if (!$("#order").hidden) $("#order-toggle").focus();
+    }
+
     $("#order-items").addEventListener("click", (e) => {
-      const btn = e.target.closest("[data-remove]");
+      const rm = e.target.closest("[data-remove]");
+      if (rm) {
+        setCartQty(rm.dataset.remove, 0);
+        return;
+      }
+      const btn = e.target.closest("button[data-act]");
       if (!btn) return;
-      setQty(btn.dataset.remove, 0);
-      if (!$("#order").hidden) $("#order-toggle").focus();
+      const key = btn.closest("li").dataset.key;
+      const cur = order[key] || 0;
+      if (btn.dataset.act === "inc") setCartQty(key, cur + 1, "inc");
+      else if (btn.dataset.act === "dec") setCartQty(key, cur - 1, "dec");
+    });
+
+    $("#order-items").addEventListener("change", (e) => {
+      if (e.target.dataset.act !== "qty") return;
+      setCartQty(e.target.closest("li").dataset.key, e.target.value, "qty");
+    });
+
+    // preventDefault stops the same Enter from activating the toggle that may receive focus next.
+    $("#order-items").addEventListener("keydown", (e) => {
+      if (e.target.dataset.act === "qty" && e.key === "Enter") { e.preventDefault(); e.target.blur(); }
     });
 
     $("#order-copy").addEventListener("click", async () => {
