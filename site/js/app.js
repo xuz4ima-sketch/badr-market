@@ -475,8 +475,6 @@
       q.focus();
     });
 
-    $("#print").addEventListener("click", () => window.print());
-
     const toTop = $("#to-top");
     toTop.addEventListener("click", () => window.scrollTo({ top: 0 }));
     window.addEventListener("scroll", () => { toTop.hidden = window.scrollY < 600; }, { passive: true });
