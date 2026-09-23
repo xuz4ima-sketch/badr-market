@@ -4,11 +4,8 @@
   const CFG = window.BADR_CONFIG || {};
   const CONTACTS = CFG.contacts || {};
   const LS_PRICES = "badr:prices:v1";
-  const LS_ORDER = "badr:order:v1";
   const LOCAL_CSV = "data/prices.csv";
   const FETCH_TIMEOUT = 10000;
-  const LONG_MESSAGE = 1500;
-  const MAX_QTY = 9999;
   const NBSP = " ";
   const SVGNS = "http://www.w3.org/2000/svg";
 
@@ -226,45 +223,18 @@
     handledHash: false,
   };
 
-  let order = lsGet(LS_ORDER) || {};
-  if (typeof order !== "object" || Array.isArray(order)) order = {};
-
-  function renderQty(td, item) {
-    td.replaceChildren();
-    if (item.stock === "out") return;
-    const q = order[item.key] || 0;
-    if (!q) {
-      td.append(el("button", {
-        type: "button", class: "icon-btn", "data-act": "add",
-        "aria-label": `Добавить ${item.display} в корзину`,
-      }, icon("plus")));
-      return;
-    }
-    td.append(el("div", { class: "stepper" },
-      el("button", { type: "button", class: "icon-btn", "data-act": "dec", "aria-label": `Уменьшить количество: ${item.display}` }, icon("minus")),
-      el("input", {
-        type: "number", inputmode: "numeric", min: "0", max: String(MAX_QTY), value: String(q),
-        "data-act": "qty", "aria-label": `Количество: ${item.display}`,
-      }),
-      el("button", { type: "button", class: "icon-btn", "data-act": "inc", "aria-label": `Увеличить количество: ${item.display}` }, icon("plus")),
-    ));
-  }
-
   function renderRow(item) {
     const name = el("td", { class: "c-name" }, el("span", { class: "name", text: item.display }));
     if (item.isNew) name.append(el("span", { class: "badge badge-new", text: "Новинка" }));
     if (item.stock === "order") name.append(el("span", { class: "badge", text: "Под заказ" }));
     if (item.stock === "out") name.append(el("span", { class: "badge badge-out", text: "Нет в наличии" }));
 
-    const qty = el("td", { class: "c-qty" });
-    renderQty(qty, item);
     const tr = el("tr", { class: item.stock === "out" ? "is-out" : null, "data-key": item.key },
       name,
       el("td", { class: "c-opt num", "data-label": "Опт", text: item.opt != null ? rub(item.opt) : "—" }),
       el("td", { class: "c-ret num", "data-label": "Розн.", text: item.ret != null ? rub(item.ret) : "—" }),
-      qty,
     );
-    return { item, tr, qty };
+    return { item, tr };
   }
 
   function render(data) {
@@ -284,7 +254,6 @@
           el("th", { scope: "col", text: "Наименование" }),
           el("th", { scope: "col", class: "num", text: "Опт" }),
           el("th", { scope: "col", class: "num", text: "Розница" }),
-          el("th", { scope: "col", class: "num" }, el("span", { class: "sr-only", text: "Корзина" })),
         )),
         el("tbody", null, ...rows.map((r) => r.tr)),
       );
@@ -367,10 +336,8 @@
 
   function show(data) {
     state.data = data;
-    pruneOrder();
     render(data);
     updateMeta(data);
-    renderOrder();
     if (!state.handledHash) {
       state.handledHash = true;
       openFromHash();
@@ -451,168 +418,16 @@
     }
   }
 
-  /* ---------- Order ---------- */
+  /* ---------- Contact dock ---------- */
 
-  function saveOrder() { lsSet(LS_ORDER, order); }
-
-  function pruneOrder() {
-    for (const [key, q] of Object.entries(order)) {
-      const item = state.data.byKey.get(key);
-      if (!item || item.stock === "out" || !(q > 0)) delete order[key];
-    }
-    saveOrder();
-  }
-
-  function rowView(key) {
-    for (const v of state.groupViews) {
-      const r = v.rows.find((row) => row.item.key === key);
-      if (r) return r;
-    }
-    return null;
-  }
-
-  function setQty(key, value, focusAfter) {
-    const q = Math.max(0, Math.min(MAX_QTY, Math.floor(Number(value)) || 0));
-    if (q) order[key] = q;
-    else delete order[key];
-    saveOrder();
-    const r = rowView(key);
-    if (r) {
-      renderQty(r.qty, r.item);
-      if (focusAfter) {
-        const target = r.qty.querySelector(`[data-act="${focusAfter}"]`) || r.qty.querySelector("button");
-        if (target) target.focus();
-      }
-    }
-    renderOrder();
-  }
-
-  function orderLines() {
-    if (!state.data) return [];
-    return Object.entries(order)
-      .map(([key, q]) => ({ item: state.data.byKey.get(key), q }))
-      .filter((l) => l.item);
-  }
-
-  function orderMessage(lines) {
-    let total = 0;
-    let pcs = 0;
-    const out = lines.map(({ item, q }, i) => {
-      pcs += q;
-      if (item.opt == null) return `${i + 1}. ${item.display} — ${q} ${item.unit} (цена по запросу)`;
-      total += item.opt * q;
-      return `${i + 1}. ${item.display} — ${q} ${item.unit} × ${rub(item.opt)} = ${rub(item.opt * q)}`;
-    });
-    const n = lines.length;
-    const parts = [
-      "Ассаляму алейкум! Заявка с сайта badr.market:",
-      "",
-      ...out,
-      "",
-      `Итого по опту: ${rub(total)} (${n} ${plural(n, ["позиция", "позиции", "позиций"])}, ${pcs} шт)`,
-    ];
-    if (state.data && state.data.date) parts.push(`Прайс от ${state.data.date}`);
-    return parts.join("\n");
-  }
-
-  function renderOrder() {
-    const lines = orderLines();
-    const has = lines.length > 0;
-    $("#order").hidden = !has;
-    const anyQuick = ["phone", "whatsapp", "telegram"].some((k) => contactLinks[k]);
-    $("#dock").hidden = has || !anyQuick;
-    updateCartButton(lines);
-
-    if (!has) {
-      setOrderOpen(false);
-      updateDockSpace();
-      return;
-    }
-
-    let total = 0;
-    for (const { item, q } of lines) if (item.opt != null) total += item.opt * q;
-    const n = lines.length;
-    $("#order-sum").textContent = `Корзина: ${n} ${plural(n, ["позиция", "позиции", "позиций"])} на ${rub(total)}`;
-
-    $("#order-items").replaceChildren(...lines.map(({ item, q }) => el("li", { "data-key": item.key },
-      el("span", { class: "oi-text" },
-        el("span", { text: item.display }),
-        el("span", { class: "oi-price", text: item.opt != null ? `${rub(item.opt)} / ${item.unit}` : "цена по запросу" }),
-      ),
-      el("div", { class: "stepper" },
-        el("button", { type: "button", class: "icon-btn", "data-act": "dec", "aria-label": `Уменьшить количество: ${item.display}` }, icon("minus")),
-        el("input", {
-          type: "number", inputmode: "numeric", min: "0", max: String(MAX_QTY), value: String(q),
-          "data-act": "qty", "aria-label": `Количество: ${item.display}`,
-        }),
-        el("button", { type: "button", class: "icon-btn", "data-act": "inc", "aria-label": `Увеличить количество: ${item.display}` }, icon("plus")),
-      ),
-      el("span", { class: "oi-sum", text: item.opt != null ? rub(item.opt * q) : "по запросу" }),
-      el("button", { type: "button", class: "icon-btn", "data-remove": item.key, "aria-label": `Убрать из корзины: ${item.display}` }, icon("x")),
-    )));
-
-    const text = encodeURIComponent(orderMessage(lines));
-    const wa = $("#send-wa");
-    const tg = $("#send-tg");
-    wa.hidden = !contactLinks.whatsapp;
-    tg.hidden = !contactLinks.telegram;
-    if (contactLinks.whatsapp) wa.href = `${contactLinks.whatsapp}?text=${text}`;
-    if (contactLinks.telegram) tg.href = `${contactLinks.telegram}?text=${text}`;
-
+  function setupDock() {
+    $("#dock").hidden = !["phone", "whatsapp", "telegram"].some((k) => contactLinks[k]);
     updateDockSpace();
-  }
-
-  function updateCartButton(lines) {
-    const n = lines.length;
-    const count = $("#cart-count");
-    const prev = count.textContent;
-    count.hidden = !n;
-    count.textContent = n ? String(n) : "";
-    $("#cart-btn").setAttribute("aria-label",
-      n ? `Корзина: ${n} ${plural(n, ["позиция", "позиции", "позиций"])}` : "Корзина пуста");
-    if (n && prev !== count.textContent) {
-      count.classList.remove("is-bumped");
-      void count.offsetWidth; // restart the animation
-      count.classList.add("is-bumped");
-    }
-  }
-
-  function setOrderOpen(open) {
-    $("#order-toggle").setAttribute("aria-expanded", String(open));
-    $("#order-body").hidden = !open;
-    updateDockSpace();
-  }
-
-  async function copyText(text) {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch {
-      const ta = el("textarea", { readonly: true, style: "position:fixed;opacity:0" });
-      ta.value = text;
-      document.body.append(ta);
-      ta.select();
-      let ok = false;
-      try { ok = document.execCommand("copy"); } catch { ok = false; }
-      ta.remove();
-      return ok;
-    }
-  }
-
-  let toastTimer = 0;
-  function toast(text) {
-    const t = $("#toast");
-    t.textContent = text;
-    t.hidden = false;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { t.hidden = true; }, 3500);
   }
 
   function updateDockSpace() {
-    const orderEl = $("#order");
     const dockEl = $("#dock");
-    const h = !orderEl.hidden ? orderEl.querySelector(".order-bar").offsetHeight
-      : !dockEl.hidden ? dockEl.offsetHeight : 0;
+    const h = !dockEl.hidden ? dockEl.offsetHeight : 0;
     document.documentElement.style.setProperty("--dock-h", h + "px");
   }
 
@@ -632,25 +447,7 @@
           if (open) history.replaceState(null, "", "#" + view.slug);
         }
         setExpanded(view, open);
-        return;
       }
-      const btn = e.target.closest("[data-act]");
-      if (!btn || btn.tagName === "INPUT") return;
-      const key = btn.closest("tr").dataset.key;
-      const cur = order[key] || 0;
-      if (btn.dataset.act === "add") setQty(key, 1, "inc");
-      else if (btn.dataset.act === "inc") setQty(key, cur + 1, "inc");
-      else if (btn.dataset.act === "dec") setQty(key, cur - 1, cur - 1 > 0 ? "dec" : "add");
-    });
-
-    groups.addEventListener("change", (e) => {
-      if (e.target.dataset.act !== "qty") return;
-      const key = e.target.closest("tr").dataset.key;
-      setQty(key, e.target.value, Number(e.target.value) > 0 ? "qty" : "add");
-    });
-
-    groups.addEventListener("keydown", (e) => {
-      if (e.target.dataset.act === "qty" && e.key === "Enter") e.target.blur();
     });
 
     const q = $("#q");
@@ -678,93 +475,6 @@
     });
 
     $("#print").addEventListener("click", () => window.print());
-
-    $("#cart-btn").addEventListener("click", () => {
-      if (!orderLines().length) {
-        toast("Корзина пуста — нажмите «+» рядом с книгой");
-        $("#price").scrollIntoView();
-        return;
-      }
-      setOrderOpen(true);
-      $("#order-toggle").focus({ preventScroll: true });
-    });
-
-    $("#order-toggle").addEventListener("click", () => {
-      setOrderOpen($("#order-toggle").getAttribute("aria-expanded") !== "true");
-    });
-
-    // The cart list is re-rendered on every change, so put focus back on the same control afterwards.
-    function setCartQty(key, value, act) {
-      setQty(key, value);
-      const target = act && [...$("#order-items").children]
-        .find((li) => li.dataset.key === key)?.querySelector(`[data-act="${act}"]`);
-      if (target) target.focus();
-      else if (!$("#order").hidden) $("#order-toggle").focus();
-    }
-
-    $("#order-items").addEventListener("click", (e) => {
-      const rm = e.target.closest("[data-remove]");
-      if (rm) {
-        setCartQty(rm.dataset.remove, 0);
-        return;
-      }
-      const btn = e.target.closest("button[data-act]");
-      if (!btn) return;
-      const key = btn.closest("li").dataset.key;
-      const cur = order[key] || 0;
-      if (btn.dataset.act === "inc") setCartQty(key, cur + 1, "inc");
-      else if (btn.dataset.act === "dec") setCartQty(key, cur - 1, "dec");
-    });
-
-    $("#order-items").addEventListener("change", (e) => {
-      if (e.target.dataset.act !== "qty") return;
-      setCartQty(e.target.closest("li").dataset.key, e.target.value, "qty");
-    });
-
-    // preventDefault stops the same Enter from activating the toggle that may receive focus next.
-    $("#order-items").addEventListener("keydown", (e) => {
-      if (e.target.dataset.act === "qty" && e.key === "Enter") { e.preventDefault(); e.target.blur(); }
-    });
-
-    $("#order-copy").addEventListener("click", async () => {
-      const ok = await copyText(orderMessage(orderLines()));
-      toast(ok ? "Заявка скопирована" : "Не удалось скопировать. Выделите список вручную.");
-    });
-
-    const clearBtn = $("#order-clear");
-    const clearLabel = clearBtn.querySelector("span");
-    let armTimer = 0;
-    clearBtn.addEventListener("click", () => {
-      if (clearBtn.dataset.armed) {
-        clearTimeout(armTimer);
-        delete clearBtn.dataset.armed;
-        clearLabel.textContent = "Очистить";
-        order = {};
-        saveOrder();
-        state.groupViews.forEach((v) => v.rows.forEach((r) => renderQty(r.qty, r.item)));
-        renderOrder();
-        toast("Корзина очищена");
-        return;
-      }
-      clearBtn.dataset.armed = "1";
-      clearLabel.textContent = "Точно очистить?";
-      armTimer = setTimeout(() => {
-        delete clearBtn.dataset.armed;
-        clearLabel.textContent = "Очистить";
-      }, 4000);
-    });
-
-    // Telegram can drop long prefilled text, so the order is also put on the clipboard.
-    for (const id of ["#send-wa", "#send-tg"]) {
-      $(id).addEventListener("click", () => {
-        const text = orderMessage(orderLines());
-        if (id === "#send-tg" || text.length > LONG_MESSAGE) {
-          copyText(text).then((ok) => {
-            if (ok) toast("Заявка скопирована — вставьте её в чат, если текст не подставился");
-          });
-        }
-      });
-    }
 
     const toTop = $("#to-top");
     toTop.addEventListener("click", () => window.scrollTo({ top: 0 }));
@@ -829,6 +539,6 @@
 
   bindEvents();
   setupMotion();
-  renderOrder();
+  setupDock();
   loadPrices();
 })();
