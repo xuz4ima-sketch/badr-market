@@ -106,7 +106,8 @@
     if (!rows.length) throw new Error("Пустой CSV");
     const head = rows[0].map((h) => norm(h.trim()));
     const col = (name) => head.indexOf(name);
-    const iSeries = col("серия"), iName = col("наименование"), iOpt = col("опт"),
+    // The series column is always first; tolerate a blank or renamed header in A1.
+    const iSeries = col("серия") >= 0 ? col("серия") : 0, iName = col("наименование"), iOpt = col("опт"),
       iRet = col("розница"), iUnit = col("ед."), iStock = col("наличие"), iNew = col("новинка");
     if (iName < 0 || iOpt < 0) throw new Error("Нет колонок «Наименование» и «Опт»");
 
