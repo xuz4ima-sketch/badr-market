@@ -1,22 +1,66 @@
-# Публикует папку site на GitHub Pages (ветка gh-pages) после каждого пуша в main.
+# Публикует папку site на GitHub Pages (ветка gh-pages).
+# Запускается после каждого пуша в main и каждые 15 минут: перед публикацией
+# забирает свежий прайс из опубликованной Google Таблицы, чтобы браузеру посетителя
+# не приходилось обращаться к Google.
 name: Публикация сайта
 
 on:
   push:
     branches: [main]
     paths: ["site/**"]
+  schedule:
+    - cron: "*/15 * * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+env:
+  PRICE_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vReSmyxd1DVMcWFWYZ8-Zdz1TPwe81Eewdl2MnbYCfY6sjfCrCZV0CazmqhOhGgQha-5GeBoV3nmtE-/pub?gid=496609157&single=true&output=csv"
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: peaceiris/actions-gh-pages@v4
+
+      - name: Обновить прайс из Google Таблицы
+        id: prices
+        run: |
+          set +e
+          if curl -fsSL --max-time 60 "$PRICE_CSV_URL" -o /tmp/prices.csv \
+             && head -1 /tmp/prices.csv | grep -q "Наименование" \
+             && [ "$(wc -l < /tmp/prices.csv)" -gt 50 ]; then
+            cp /tmp/prices.csv site/data/prices.csv
+            python3 "обновить-прайс.py"
+          else
+            echo "::warning::Не удалось получить прайс из таблицы, остаётся прошлая версия"
+          fi
+          if git diff --quiet -- site/data; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Сохранить свежий прайс в репозитории
+        if: steps.prices.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/data
+          git commit -m "Автообновление прайса из Google Таблицы"
+          git pull --rebase
+          git push
+
+      - name: Опубликовать сайт
+        if: github.event_name != 'schedule' || steps.prices.outputs.changed == 'true'
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
           publish_branch: gh-pages
+          force_orphan: true

@@ -13,9 +13,9 @@ window.BADR_CONFIG = {
     instagram: "",
   },
 
-  // Ссылка на лист «Прайс», опубликованный как CSV (Файл → Поделиться → Опубликовать в интернете).
-  // Пока пусто — сайт показывает прайс из файла data/prices.csv.
-  sheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vReSmyxd1DVMcWFWYZ8-Zdz1TPwe81Eewdl2MnbYCfY6sjfCrCZV0CazmqhOhGgQha-5GeBoV3nmtE-/pub?gid=496609157&single=true&output=csv",
+  // Оставьте пустым: прайс из Google Таблицы забирает GitHub каждые 15 минут
+  // (см. .github/workflows/pages.yml) и кладёт в data/prices.csv.
+  sheetCsvUrl: "",
 
   // ID Google-таблицы (часть ссылки между /d/ и /edit) — для кнопки «Скачать Excel».
   sheetId: "",
