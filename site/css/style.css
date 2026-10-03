@@ -480,7 +480,9 @@ h1 {
 .terms {
   margin-top: 56px;
   padding: 28px 32px;
-  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--fg) 4%, transparent);
 }
 .terms h3 { margin-bottom: 12px; }
 
@@ -488,303 +490,32 @@ h1 {
   .terms { padding: 20px; }
 }
 
-/* Price list */
+/* Price list: one download block */
 
-.price-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px 24px;
+.price {
+  background:
+    radial-gradient(70% 90% at 100% 0%, #232a5e 0%, transparent 60%),
+    linear-gradient(180deg, var(--night) 0%, var(--night-3) 100%);
 }
 
-.price-head { align-items: flex-end; }
-.price-date { margin: 10px 0 0; color: var(--soft); font-size: 15px; }
-@media (max-width: 640px) {
-  .btn-excel { flex: 1 1 100%; }
-}
-
-.toolbar-main {
-  display: flex;
-  gap: 12px;
-  margin-top: 20px;
-  padding: 12px 0;
-  background: var(--bg);
-}
-
-@media (min-width: 768px) {
-  .toolbar-main {
-    position: sticky;
-    top: var(--head-h);
-    z-index: 5;
-  }
-}
-
-.search {
-  position: relative;
-  flex: 1 1 auto;
-  display: flex;
+.price-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
+  gap: 32px 56px;
 }
-.search > .i {
-  position: absolute;
-  left: 16px;
-  pointer-events: none;
-}
-.search input {
-  width: 100%;
-  min-height: 52px;
-  padding: 0 52px 0 48px;
-  border: 1px solid color-mix(in srgb, var(--fg) 28%, transparent);
-  border-radius: 16px;
-  background: var(--bg);
-  font-size: 16px;
-}
-.search input::placeholder { color: var(--soft); opacity: 1; }
-.search input::-webkit-search-cancel-button { display: none; }
-.search input:focus-visible { outline-offset: 0; }
-.search-clear {
-  position: absolute;
-  right: 4px;
-  border-color: transparent;
-}
+.price .lead { margin-top: 16px; color: var(--soft); }
+.price-date { margin: 14px 0 0; color: var(--accent); font-size: 15px; font-weight: 600; }
 
-.select { position: relative; flex: 0 0 220px; }
-.select select {
-  appearance: none;
-  width: 100%;
-  min-height: 52px;
-  padding: 0 44px 0 16px;
-  border: 1px solid color-mix(in srgb, var(--fg) 28%, transparent);
-  border-radius: 16px;
-  background: var(--bg);
-  font-size: 15px;
-  cursor: pointer;
-}
-.select select:focus-visible { outline-offset: 0; }
-.select .i {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  translate: 0 -50%;
-  pointer-events: none;
-}
-
-.toolbar-extra {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 16px;
-  padding-top: 4px;
-}
-
-.check {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  cursor: pointer;
-  font-size: 15px;
-}
-.check input {
-  width: 20px;
-  height: 20px;
-  margin: 0;
-  accent-color: var(--accent);
-  cursor: pointer;
-}
-
-.tools { display: flex; gap: 4px; }
-
-.status {
-  margin: 20px 0 8px;
-  color: var(--soft);
-  font-size: 14px;
-}
-
-.notice {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  margin: 12px 0;
-  padding: 14px 16px;
-  border: 1px solid var(--rule);
-  border-radius: 14px;
-  background: var(--paper-2);
-  font-size: 15px;
-}
-.notice .i { margin-top: 2px; }
+.price-action { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.btn-excel { min-height: 64px; padding: 0 34px; font-size: 17px; }
+.btn-excel .i { width: 22px; height: 22px; }
+.price-file { margin: 0; color: var(--soft); font-size: 14px; }
 
 @media (max-width: 767px) {
-  .toolbar-main { flex-wrap: wrap; gap: 8px; }
-  .select { flex: 1 1 100%; }
+  .price-card { grid-template-columns: 1fr; }
+  .price-action { align-items: stretch; text-align: center; }
 }
-
-/* Series — styled like a book's table of contents */
-
-.groups { border-top: 2px solid var(--fg); }
-
-/* Keeps the series title clear of the sticky search bar when jumping to #slug. */
-.group { border-bottom: 1px solid var(--rule); scroll-margin-top: calc(var(--head-h) + 92px); }
-@media (max-width: 767px) {
-  .group { scroll-margin-top: calc(var(--head-h) + 16px); }
-}
-
-.group-title { margin: 0; font: inherit; }
-
-.group-toggle {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  width: 100%;
-  min-height: 64px;
-  padding: 16px 0;
-  border: 0;
-  background: none;
-  text-align: left;
-  cursor: pointer;
-}
-
-.g-name {
-  font: 600 clamp(20px, 2.4vw, 24px)/1.2 var(--font-display);
-}
-
-.g-dots {
-  flex: 1 1 auto;
-  min-width: 24px;
-  border-bottom: 2px dotted var(--line);
-  translate: 0 -5px;
-}
-
-.g-count {
-  font-size: 14px;
-  color: var(--soft);
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
-.group-toggle .i {
-  align-self: center;
-  width: 34px;
-  height: 34px;
-  padding: 8px;
-  border-radius: 50%;
-  border: 1px solid var(--rule);
-  transition: rotate 300ms var(--ease), background-color 200ms, color 200ms, border-color 200ms;
-}
-.group-toggle[aria-expanded="true"] .i { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-.group-toggle[aria-expanded="true"] .i { rotate: 180deg; }
-
-@media (hover: hover) {
-  .group-toggle:hover .g-name { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 1px; }
-}
-
-.group-body { padding-bottom: 24px; animation: open-down 350ms var(--ease); }
-.group-toggle .g-name { transition: letter-spacing 300ms var(--ease); }
-@media (hover: hover) {
-  .group-toggle:hover .g-name { letter-spacing: 0.02em; }
-}
-
-.ptable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 15px;
-  line-height: 1.4;
-}
-
-.ptable th {
-  padding: 8px 12px 8px 0;
-  border-bottom: 1px solid var(--fg);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--soft);
-  text-align: left;
-}
-.ptable th.num, .ptable td.num { text-align: right; }
-.ptable th:last-child, .ptable td:last-child { padding-right: 0; }
-
-.ptable td {
-  padding: 10px 12px 10px 0;
-  border-bottom: 1px solid var(--line);
-  vertical-align: middle;
-}
-.ptable tr:last-child td { border-bottom: 0; }
-
-.c-name { width: auto; }
-.c-name .name { font-weight: 600; }
-.c-opt, .c-ret {
-  width: 110px;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-.c-opt { font-weight: 600; }
-.c-ret { color: var(--soft); }
-
-.ptable tbody tr.is-filtered { display: none; }
-.group.is-filtered { display: none; }
-
-@media (hover: hover) {
-  .ptable tbody tr { transition: background-color 200ms; }
-  .ptable tbody tr:hover { background: var(--paper-2); }
-}
-
-.badge {
-  display: inline-block;
-  margin-left: 8px;
-  padding: 3px 7px;
-  border: 1px solid var(--fg);
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.2;
-  vertical-align: 1px;
-  white-space: nowrap;
-}
-.badge-new { border-color: transparent; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--on-accent); }
-.badge-out { border-color: var(--muted); color: var(--muted); }
-
-tr.is-out .c-name .name,
-tr.is-out .c-opt { color: var(--muted); font-weight: 400; }
-
-@media screen and (max-width: 767px) {
-  .ptable thead { display: none; }
-  .ptable, .ptable tbody { display: block; }
-  .ptable tbody tr {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    grid-template-areas:
-      "name name"
-      "opt  ret";
-    align-items: center;
-    column-gap: 12px;
-    row-gap: 6px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .ptable tbody tr.is-filtered { display: none; }
-  .ptable tbody tr:last-child { border-bottom: 0; }
-  .ptable td { padding: 0; border: 0; width: auto; }
-  .c-name { grid-area: name; }
-  .c-opt { grid-area: opt; text-align: left !important; }
-  .c-ret { grid-area: ret; text-align: left !important; }
-  .c-opt::before, .c-ret::before {
-    content: attr(data-label) "\00a0";
-    font-weight: 400;
-    color: var(--soft);
-    font-size: 13px;
-  }
-}
-
-.skel {
-  animation: pulse 1.2s ease-in-out infinite alternate;
-  height: 64px;
-  border-bottom: 1px solid var(--line);
-  background: linear-gradient(90deg, var(--paper-2) 0 30%, transparent 30%) no-repeat 0 50% / 100% 22px;
-}
-
-.empty { padding: 40px 0; }
-.empty p { margin: 0 0 16px; font-size: 17px; }
 
 /* Section labels */
 
@@ -1281,10 +1012,6 @@ html:has(.viewer[open]) { overflow: hidden; }
   from { opacity: 0; transform: scale(0.8); }
   to { opacity: 1; transform: none; }
 }
-@keyframes open-down {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: none; }
-}
 @keyframes slide-up {
   from { transform: translateY(100%); }
   to { transform: none; }
@@ -1292,32 +1019,4 @@ html:has(.viewer[open]) { overflow: hidden; }
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
-}
-@keyframes pulse {
-  from { opacity: 1; }
-  to { opacity: 0.45; }
-}
-/* Print: only the full price list */
-
-@media print {
-  @page { margin: 14mm; }
-  /* Animations freeze on their first frame in print (opacity 0), which left the tables blank. */
-  *, *::before, *::after { animation: none !important; transition: none !important; }
-  body { padding: 0; font-size: 11pt; }
-  .topbar, .hero, .terms, .about, .products, .series, .buy, .contacts, .foot, .dock, .to-top, .skip, .viewer, .btn-excel,
-  .toolbar-main, .toolbar-extra, .status, .notice, .empty, .group-toggle .i, .skel { display: none !important; }
-  .sec { padding: 0; border: 0 !important; }
-  .price-head { margin-bottom: 8pt; }
-  .price-head::before { content: "Издательский Дом «BadrBook» · +7 922 359-15-00"; display: block; width: 100%; font: 600 10pt var(--font-text); }
-  h2 { font-size: 22pt; }
-  .price-date[hidden] { display: none !important; }
-  .group, .group.is-filtered { display: block !important; break-inside: auto; }
-  .group-body { display: block !important; padding-bottom: 8pt; }
-  .ptable tbody tr.is-filtered { display: table-row !important; }
-  .group-toggle { min-height: 0; padding: 10pt 0 4pt; }
-  .g-count { font-size: 0; }
-  .g-count::after { content: attr(data-total); font-size: 9pt; }
-  .ptable td { padding: 3pt 8pt 3pt 0; }
-  .ptable thead { display: table-header-group; }
-  tr { break-inside: avoid; }
 }
