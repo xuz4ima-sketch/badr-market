@@ -28,6 +28,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Установить openpyxl для прайса в Excel
+        run: pip install --quiet openpyxl==3.1.5
+
       - name: Обновить прайс из Google Таблицы
         id: prices
         run: |
@@ -36,7 +43,10 @@ jobs:
              && head -1 /tmp/prices.csv | grep -q "Наименование" \
              && [ "$(wc -l < /tmp/prices.csv)" -gt 50 ]; then
             cp /tmp/prices.csv site/data/prices.csv
-            python3 "обновить-прайс.py"
+            # Excel пересобирается только при изменении прайса: иначе файл менялся бы на каждом запуске.
+            if ! git diff --quiet -- site/data/prices.csv || [ ! -f site/data/badr-price.xlsx ]; then
+              python "обновить-прайс.py"
+            fi
           else
             echo "::warning::Не удалось получить прайс из таблицы, остаётся прошлая версия"
           fi

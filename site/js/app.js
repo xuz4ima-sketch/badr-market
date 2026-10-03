@@ -205,11 +205,158 @@
     $("#contacts-empty").hidden = main || social;
   }
 
-  function fillText(sectionSel, targetSel, text) {
+  function fillText(targetSel, text) {
     const paras = String(text || "").split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
-    $(sectionSel).hidden = !paras.length;
     $(targetSel).replaceChildren(...paras.map((p) => el("p", { text: p })));
+    $(targetSel).hidden = !paras.length;
     return paras.length > 0;
+  }
+
+  /* ---------- Where to buy ---------- */
+
+  const MARKETS = [
+    { key: "wildberries", name: "Wildberries", color: "#cb11ab" },
+    { key: "ozon", name: "Ozon", color: "#005bff" },
+    { key: "avito", name: "Авито", color: "#00aaff" },
+  ];
+
+  function webUrl(raw) {
+    const s = String(raw || "").trim();
+    if (!s) return null;
+    const url = /^https?:\/\//i.test(s) ? s : "https://" + s;
+    try {
+      return new URL(url).href;
+    } catch {
+      return null;
+    }
+  }
+
+  function setupBuy() {
+    const stores = (Array.isArray(CFG.stores) ? CFG.stores : [])
+      .filter((st) => st && String(st.city || "").trim());
+    $("#cities").replaceChildren(...stores.map((st) => {
+      const address = String(st.address || "").trim();
+      const map = webUrl(st.map);
+      const body = [
+        icon("map-pin"),
+        el("span", { class: "city-text" },
+          el("span", { class: "city", text: String(st.city).trim() }),
+          address ? el("span", { class: "city-addr", text: address }) : null),
+      ];
+      return el("li", null, map
+        ? el("a", { class: "city-card", href: map, target: "_blank", rel: "noopener" }, ...body)
+        : el("div", { class: "city-card" }, ...body));
+    }));
+    $("#stores-block").hidden = !stores.length;
+    $("#stat-cities").textContent = String(stores.length);
+    $("#stat-cities").parentElement.hidden = !stores.length;
+
+    const links = CFG.marketplaces || {};
+    $("#markets").replaceChildren(...MARKETS.map((m) => {
+      const url = webUrl(links[m.key]);
+      const body = [
+        el("span", { class: "market-dot", style: `--brand: ${m.color}` }),
+        el("span", { class: "market-text" },
+          el("span", { class: "market-name", text: m.name }),
+          el("span", { class: "market-note", text: url ? "Перейти в магазин" : "Ссылка скоро появится" })),
+        url ? icon("arrow-up-right") : null,
+      ];
+      return el("li", null, url
+        ? el("a", { class: "market", href: url, target: "_blank", rel: "noopener" }, ...body)
+        : el("div", { class: "market is-soon" }, ...body));
+    }));
+  }
+
+  /* ---------- Books: gallery and full-size viewer ---------- */
+
+  const viewer = { list: [], index: 0, opener: null };
+
+  function showViewerItem() {
+    const item = viewer.list[viewer.index];
+    const img = $("#viewer-img");
+    img.src = item.src;
+    img.alt = item.alt;
+    const n = viewer.list.length;
+    $("#viewer-cap").textContent = n > 1 ? `${item.alt} · ${viewer.index + 1} из ${n}` : item.alt;
+    $("#viewer-prev").hidden = n < 2;
+    $("#viewer-next").hidden = n < 2;
+  }
+
+  function stepViewer(delta) {
+    const n = viewer.list.length;
+    viewer.index = (viewer.index + delta + n) % n;
+    showViewerItem();
+  }
+
+  function openViewer(list, index, opener) {
+    const dialog = $("#viewer");
+    if (typeof dialog.showModal !== "function") {
+      window.open(list[index].src, "_blank", "noopener");
+      return;
+    }
+    viewer.list = list;
+    viewer.index = index;
+    viewer.opener = opener;
+    showViewerItem();
+    dialog.showModal();
+  }
+
+  function setupViewer() {
+    const dialog = $("#viewer");
+    $("#viewer-close").addEventListener("click", () => dialog.close());
+    $("#viewer-prev").addEventListener("click", () => stepViewer(-1));
+    $("#viewer-next").addEventListener("click", () => stepViewer(1));
+    // A click on the dimmed area around the picture closes the viewer.
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog || e.target.classList.contains("viewer-fig")) dialog.close();
+    });
+    dialog.addEventListener("keydown", (e) => {
+      if (viewer.list.length < 2) return;
+      if (e.key === "ArrowLeft") { e.preventDefault(); stepViewer(-1); }
+      else if (e.key === "ArrowRight") { e.preventDefault(); stepViewer(1); }
+    });
+    let startX = null;
+    dialog.addEventListener("touchstart", (e) => { startX = e.touches[0].clientX; }, { passive: true });
+    dialog.addEventListener("touchend", (e) => {
+      if (startX == null || viewer.list.length < 2) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      startX = null;
+      if (Math.abs(dx) > 50) stepViewer(dx < 0 ? 1 : -1);
+    });
+    dialog.addEventListener("close", () => {
+      if (viewer.opener) viewer.opener.focus({ preventScroll: true });
+    });
+  }
+
+  function setupBooks() {
+    const track = $("#books-track");
+    const items = [...track.querySelectorAll(".book")].map((button) => {
+      const img = button.querySelector("img");
+      return { button, src: img.getAttribute("src"), alt: img.alt, series: button.dataset.series || "" };
+    });
+    items.forEach((item, i) => item.button.addEventListener("click", () => openViewer(items, i, item.button)));
+
+    const prev = $("#books-prev");
+    const next = $("#books-next");
+    const step = () => Math.max(track.clientWidth * 0.8, 160);
+    prev.addEventListener("click", () => track.scrollBy({ left: -step() }));
+    next.addEventListener("click", () => track.scrollBy({ left: step() }));
+    const syncArrows = () => {
+      prev.disabled = track.scrollLeft < 8;
+      next.disabled = track.scrollLeft + track.clientWidth > track.scrollWidth - 8;
+    };
+    track.addEventListener("scroll", syncArrows, { passive: true });
+    window.addEventListener("resize", syncArrows, { passive: true });
+    syncArrows();
+
+    document.querySelectorAll("[data-open-series]").forEach((btn) => {
+      const list = items.filter((item) => item.series === btn.dataset.openSeries);
+      btn.hidden = !list.length;
+      if (!list.length) return;
+      btn.querySelector("span").textContent =
+        `Смотреть ${list.length} ${plural(list.length, ["книгу", "книги", "книг"])}`;
+      btn.addEventListener("click", () => openViewer(list, 0, btn));
+    });
   }
 
   /* ---------- Price list ---------- */
@@ -330,6 +477,7 @@
     const sc = data.groups.length;
     $("#hero-stat").textContent =
       `${total} ${plural(total, ["позиция", "позиции", "позиций"])} в ${sc} ${sc % 10 === 1 && sc % 100 !== 11 ? "серии" : "сериях"} с оптовыми и розничными ценами.`;
+    $("#stat-books").textContent = String(total);
     const dateEl = $("#price-date");
     dateEl.hidden = !data.date;
     dateEl.textContent = data.date ? `Цены актуальны на ${data.date}` : "";
@@ -499,15 +647,12 @@
   /* ---------- Init ---------- */
 
   setupContacts();
-  $("[data-about-link]").hidden = !fillText("#about", "#about-text", CFG.about);
-  fillText("#terms", "#terms-text", CFG.wholesaleTerms);
+  setupBuy();
+  setupBooks();
+  setupViewer();
+  fillText("#about-text", CFG.about);
+  $("#terms").hidden = !fillText("#terms-text", CFG.wholesaleTerms);
   $("#year").textContent = String(new Date().getFullYear());
-  const sheetId = String(CFG.sheetId || "").trim();
-  if (sheetId) {
-    const dl = $("#dl");
-    dl.href = `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/export?format=xlsx`;
-    dl.hidden = false;
-  }
   function setupMotion() {
     const reveal = document.querySelectorAll("[data-reveal]");
     const navLinks = [...document.querySelectorAll(".nav a")];
