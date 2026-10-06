@@ -873,6 +873,57 @@ h1 {
   .partners-cta { padding: 20px; }
 }
 
+/* FAQ: native <details> accordion */
+
+.faq-list { max-width: 52em; margin-top: 36px; border-top: 1px solid var(--rule); }
+.faq-list details { border-bottom: 1px solid var(--rule); }
+.faq-list summary {
+  position: relative;
+  display: block;
+  padding: 22px 48px 22px 0;
+  font-weight: 600;
+  font-size: clamp(17px, 1.6vw, 19px);
+  line-height: 1.4;
+  cursor: pointer;
+  list-style: none;
+}
+.faq-list summary::-webkit-details-marker { display: none; }
+/* Plus that turns into a minus when the answer is open */
+.faq-list summary::before,
+.faq-list summary::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  width: 16px;
+  height: 2px;
+  margin-top: -1px;
+  border-radius: 1px;
+  background: var(--accent);
+  transition: transform 250ms var(--ease);
+}
+.faq-list summary::after { transform: rotate(90deg); }
+.faq-list details[open] summary::after { transform: rotate(0deg); }
+@media (hover: hover) {
+  .faq-list summary:hover { color: var(--accent); }
+}
+.faq-list details p {
+  max-width: 42em;
+  margin: -6px 0 0;
+  padding: 0 48px 24px 0;
+  color: var(--soft);
+  font-size: 16px;
+}
+.faq-list details[open] p { animation: fade-up 300ms var(--ease) both; }
+.faq-list details a { color: var(--fg); font-weight: 600; text-underline-offset: 3px; }
+
+@media (max-width: 640px) {
+  .faq-list { margin-top: 28px; }
+  .faq-list summary { padding: 18px 36px 18px 0; }
+  .faq-list summary::before, .faq-list summary::after { right: 4px; }
+  .faq-list details p { padding-right: 0; padding-bottom: 20px; }
+}
+
 /* Contacts */
 
 .contacts .lead { margin-top: 16px; color: var(--soft); }
