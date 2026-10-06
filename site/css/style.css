@@ -932,6 +932,11 @@ h1 {
   .partners-list li { padding: 16px 14px; font-size: 15px; gap: 10px; }
   .partners-cta { padding: 20px; }
 }
+/* Long words like «Образовательными» don't fit two columns on a phone */
+@media (max-width: 520px) {
+  .partners-list { grid-template-columns: minmax(0, 1fr); }
+  .partners-list li { padding: 14px 16px; font-size: 16px; overflow-wrap: break-word; hyphens: auto; }
+}
 
 /* FAQ: native <details> accordion */
 
