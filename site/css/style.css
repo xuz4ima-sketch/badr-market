@@ -10,7 +10,6 @@
   --moon-2: #caa962;
   --haze: #9ba2c8;
   --paper-2: #f2f2f2;
-  --cream: #f6f0e1;
   --line: #dadada;
   --line-dark: #333;
   --muted: #595959;
@@ -484,8 +483,13 @@ h1 {
 
 /* Sections */
 
+/* Sections alternate night blue and white, starting with the blue hero */
 .sec { padding: clamp(64px, 9vw, 112px) 0; }
-.sec + .sec.light { border-top: 1px solid var(--line); }
+.sec.dark {
+  background:
+    radial-gradient(70% 90% at 100% 0%, #232a5e 0%, transparent 60%),
+    linear-gradient(180deg, var(--night) 0%, var(--night-3) 100%);
+}
 
 .terms {
   margin-top: 56px;
@@ -501,12 +505,6 @@ h1 {
 }
 
 /* Price list: one download block */
-
-.price {
-  background:
-    radial-gradient(70% 90% at 100% 0%, #232a5e 0%, transparent 60%),
-    linear-gradient(180deg, var(--night) 0%, var(--night-3) 100%);
-}
 
 .price-card {
   display: grid;
@@ -543,9 +541,8 @@ h1 {
 
 .about-text { max-width: 62em; margin-top: 28px; font-size: 17px; }
 
-/* Favorite books: its own moonlit-paper section, a grid of six covers that open in the viewer */
+/* Favorite books: a grid of six covers that open in the viewer */
 
-.sec.light.books { --bg: var(--cream); border-top: 0; }
 .books-title {
   font-size: clamp(28px, 4vw, 46px);
   letter-spacing: 0.02em;
@@ -569,17 +566,17 @@ h1 {
   width: 100%;
   aspect-ratio: 1;
   padding: 0;
-  border: 1px solid rgba(16, 20, 43, 0.08);
+  border: 0;
   border-radius: 14px;
   overflow: hidden;
   background: var(--white);
   cursor: zoom-in;
-  box-shadow: 0 16px 30px -24px rgba(16, 20, 43, 0.6);
+  box-shadow: 0 18px 36px -20px rgba(0, 0, 0, 0.7);
   transition: transform 350ms var(--ease), box-shadow 350ms var(--ease);
 }
 .book img { width: 100%; height: 100%; object-fit: cover; }
 @media (hover: hover) {
-  .book:hover { transform: translateY(-4px); box-shadow: 0 24px 40px -22px rgba(16, 20, 43, 0.7); }
+  .book:hover { transform: translateY(-4px); box-shadow: 0 26px 44px -20px rgba(0, 0, 0, 0.8); }
 }
 
 .books-motto {
@@ -592,11 +589,6 @@ h1 {
 
 /* Products: the subjects the house publishes in */
 
-.products {
-  background:
-    radial-gradient(70% 90% at 0% 0%, #232a5e 0%, transparent 60%),
-    linear-gradient(180deg, var(--night) 0%, var(--night-3) 100%);
-}
 .products .lead { margin-top: 16px; color: var(--soft); }
 
 .cats {
@@ -653,6 +645,7 @@ h1 {
   align-self: stretch;
   aspect-ratio: 4 / 3;
   overflow: hidden;
+  border: 1px solid var(--rule);
   border-radius: 18px;
   background:
     radial-gradient(80% 90% at 80% 0%, #2a3270 0%, transparent 60%),
@@ -796,11 +789,6 @@ h1 {
 
 /* Contacts */
 
-.contacts {
-  background:
-    radial-gradient(80% 90% at 100% 100%, #232a5e 0%, transparent 60%),
-    linear-gradient(180deg, var(--night) 0%, var(--night-3) 100%);
-}
 .contacts .lead { margin-top: 16px; color: var(--soft); }
 
 .contact-row {
