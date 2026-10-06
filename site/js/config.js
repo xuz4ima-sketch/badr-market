@@ -11,6 +11,8 @@ window.BADR_CONFIG = {
     telegramChannel: "",
     // Instagram: юзернейм без @, например "badr.book"
     instagram: "",
+    // YouTube-канал: ссылка целиком
+    youtube: "https://www.youtube.com/@BADRTVRU",
   },
 
   // «Где купить наши книги»: город, адрес магазина (можно пусто) и ссылка на карту (можно пусто).

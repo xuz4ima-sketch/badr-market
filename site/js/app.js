@@ -117,6 +117,7 @@
     whatsapp: CONTACTS.whatsapp && digits(CONTACTS.whatsapp) ? "https://wa.me/" + digits(CONTACTS.whatsapp) : null,
     telegram: handle(CONTACTS.telegram) ? "https://t.me/" + handle(CONTACTS.telegram) : null,
     telegramChannel: handle(CONTACTS.telegramChannel) ? "https://t.me/" + handle(CONTACTS.telegramChannel) : null,
+    youtube: webUrl(CONTACTS.youtube),
     instagram: handle(CONTACTS.instagram) ? "https://instagram.com/" + handle(CONTACTS.instagram) + "/" : null,
   };
 
@@ -130,7 +131,7 @@
     if (value && CONTACTS.phone) value.textContent = CONTACTS.phone.trim();
 
     const main = ["phone", "whatsapp", "telegram"].some((k) => contactLinks[k]);
-    const social = ["telegramChannel", "instagram"].some((k) => contactLinks[k]);
+    const social = ["telegramChannel", "instagram", "youtube"].some((k) => contactLinks[k]);
     $("#contact-main").hidden = !main;
     $("#contact-social").hidden = !social;
     $("#contacts-empty").hidden = main || social;

@@ -17,6 +17,7 @@
   --wa: #25d366;
   --tg: #229ed9;
   --ig: #e4405f;
+  --yt: #ff0033;
 
   --font-display: "Oswald", "Arial Narrow", sans-serif;
   --font-text: "Montserrat", "Segoe UI", Arial, sans-serif;
@@ -222,14 +223,17 @@ h3 {
 .btn-wa { --glow: var(--wa); }
 .btn-tg { --glow: var(--tg); }
 .btn-ig { --glow: var(--ig); }
+.btn-yt { --glow: var(--yt); }
 .btn-contact.btn-wa .i { background: linear-gradient(135deg, #5ef08d, #1faf54); color: #fff; }
 .btn-contact.btn-tg .i { background: linear-gradient(135deg, #4cc3f5, #1c86c8); color: #fff; }
+.btn-contact.btn-yt .i { background: linear-gradient(135deg, #ff4d4d, #e00000); color: #fff; }
 .btn-contact.btn-ig .i { background: linear-gradient(45deg, #f9a93b, #e4405f 45%, #a23ccf); color: #fff; }
 @media (hover: hover) {
   .btn-contact:hover { box-shadow: 0 14px 34px -16px var(--glow); }
   .btn-contact.btn-wa:hover { border-color: var(--wa); }
   .btn-contact.btn-tg:hover { border-color: var(--tg); }
   .btn-contact.btn-ig:hover { border-color: var(--ig); }
+  .btn-contact.btn-yt:hover { border-color: var(--yt); }
 }
 
 .btn:disabled, .btn[aria-disabled="true"] { opacity: 0.4; cursor: not-allowed; }
