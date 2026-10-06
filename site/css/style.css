@@ -536,6 +536,7 @@ h1 {
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
+.eyebrow strong { color: var(--fg); font-weight: 700; }
 
 /* About */
 
