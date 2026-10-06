@@ -279,28 +279,17 @@
   }
 
   function setupBooks() {
-    const track = $("#books-track");
-    const items = [...track.querySelectorAll(".book")].map((button) => {
+    const favorites = [...$("#books-grid").querySelectorAll(".book")].map((button) => {
       const img = button.querySelector("img");
-      return { button, src: img.getAttribute("src"), alt: img.alt, series: button.dataset.series || "" };
+      return { button, src: img.getAttribute("src"), alt: img.alt };
     });
-    items.forEach((item, i) => item.button.addEventListener("click", () => openViewer(items, i, item.button)));
+    favorites.forEach((item, i) => item.button.addEventListener("click", () => openViewer(favorites, i, item.button)));
 
-    const prev = $("#books-prev");
-    const next = $("#books-next");
-    const step = () => Math.max(track.clientWidth * 0.8, 160);
-    prev.addEventListener("click", () => track.scrollBy({ left: -step() }));
-    next.addEventListener("click", () => track.scrollBy({ left: step() }));
-    const syncArrows = () => {
-      prev.disabled = track.scrollLeft < 8;
-      next.disabled = track.scrollLeft + track.clientWidth > track.scrollWidth - 8;
-    };
-    track.addEventListener("scroll", syncArrows, { passive: true });
-    window.addEventListener("resize", syncArrows, { passive: true });
-    syncArrows();
-
+    const seriesBooks = [...$("#series-books").content.querySelectorAll("img")].map((img) => (
+      { src: img.getAttribute("src"), alt: img.alt, series: img.dataset.series }
+    ));
     document.querySelectorAll("[data-open-series]").forEach((btn) => {
-      const list = items.filter((item) => item.series === btn.dataset.openSeries);
+      const list = seriesBooks.filter((item) => item.series === btn.dataset.openSeries);
       btn.hidden = !list.length;
       if (!list.length) return;
       btn.querySelector("span").textContent =
