@@ -25,13 +25,13 @@ window.BADR_CONFIG = {
 
   // «Купить онлайн»: ссылки на магазин издательства. Пока ссылки нет, на сайте написано «Ссылка скоро появится».
   marketplaces: {
-    wildberries: "",
-    ozon: "",
-    avito: "",
+    wildberries: "https://www.wildberries.ru/seller/293356",
+    ozon: "https://www.ozon.ru/seller/badr/knigi-16500/?miniapp=seller_33641",
+    avito: "https://www.avito.ru/brands/i142712173",
   },
 
-  // Оставьте пустым: прайс из Google Таблицы забирает GitHub каждые 15 минут
-  // (см. .github/workflows/pages.yml) и кладёт в data/prices.csv.
+  // Оставьте пустым: прайс собирается из PDF «Прайс на ДД.ММ.ГГ.pdf» (см. обновить-прайс.py)
+  // и лежит в data/prices.csv.
   sheetCsvUrl: "",
 
   // Текст «О нас» — между обратными кавычками ` `. Абзацы разделяются пустой строкой.

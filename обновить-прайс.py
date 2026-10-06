@@ -1,11 +1,86 @@
-# Пересобирает из site/data/prices.csv:
-#   site/data/prices.js         — копию прайса, чтобы он открывался даже при запуске index.html двойным щелчком;
-#   site/data/badr-price.xlsx   — прайс в Excel для кнопки «Скачать Excel» (нужен пакет openpyxl).
+# Пересобирает прайс сайта из PDF-файла «Прайс на ДД.ММ.ГГ.pdf» в корне проекта.
+# Если PDF несколько, берётся тот, у которого дата «Цены указаны на …» самая свежая.
+# Что создаётся:
+#   site/data/prices.csv        — прайс в виде таблицы (читает сайт и этот скрипт);
+#   site/data/prices.js         — копия прайса, чтобы он открывался даже при запуске index.html двойным щелчком;
+#   site/data/badr-price.xlsx   — прайс в Excel для кнопки «Скачать Excel».
+# Нужны пакеты: pip install pymupdf openpyxl
 # Запуск: python обновить-прайс.py
-import csv, io, json, pathlib, re
+# Если PDF в папке нет, прайс собирается из уже лежащего site/data/prices.csv.
+import csv, io, json, pathlib, re, sys
 
-root = pathlib.Path(__file__).parent / "site"
+for stream in (sys.stdout, sys.stderr):
+    stream.reconfigure(encoding="utf-8")  # чтобы русский текст читался в консоли Windows
+
+base = pathlib.Path(__file__).parent
+root = base / "site"
 data = root / "data"
+
+
+def pdf_to_rows(path):
+    """Читает PDF из 1С: строка с отступом меньше 8 — ценовая группа (издательство), с отступом 8 и больше — книга,
+    дальше идут оптовая цена, ед., розничная цена, ед. Возвращает (дата, [(серия, название, опт, розница, ед.)])."""
+    import pymupdf
+    text = "\n".join(p.get_text() for p in pymupdf.open(path))
+    lines = text.split("\n")
+    m = re.search(r"Цены указаны на\s+(\d{2}\.\d{2}\.\d{4})", text)
+    date = m.group(1) if m else None
+    skip = {"Цена", "Ед.", "Оптовая", "Розничная"}
+    is_price = lambda t: re.fullmatch(r"[\d\s ]+,\d\d\s*руб\.?", t.strip()) is not None
+
+    def num(t):
+        n = float(re.sub(r"[\s ]|руб\.?", "", t).replace(",", "."))
+        return int(n) if n.is_integer() else n
+
+    i = next((k for k, l in enumerate(lines) if l.strip() == "Розничная"), -1) + 1
+    series, out = None, []
+    while i < len(lines):
+        line = lines[i]
+        t = line.strip()
+        indent = len(line) - len(line.lstrip(" "))
+        if not t or t in skip:
+            i += 1
+        elif indent < 8:
+            series = t
+            i += 1
+        else:
+            name = t
+            i += 1
+            while i < len(lines) and not is_price(lines[i]):
+                name += " " + lines[i].strip()
+                i += 1
+            if i + 3 >= len(lines):
+                break
+            out.append((series or "", name, num(lines[i]), num(lines[i + 2]), lines[i + 1].strip() or "шт"))
+            i += 4
+    return date, out
+
+
+def newest_pdf():
+    best = None
+    for path in base.glob("Прайс*.pdf"):
+        date, rows = pdf_to_rows(path)
+        key = tuple(reversed(date.split("."))) if date else ()
+        if rows and (best is None or key > best[0]):
+            best = (key, path, date, rows)
+    return best
+
+
+found = newest_pdf()
+if found:
+    _, pdf, pdf_date, pdf_rows = found
+    buf = io.StringIO(newline="")
+    w = csv.writer(buf, lineterminator="\n")
+    w.writerow(["Серия", "Наименование", "Опт", "Розница", "Ед.", "Наличие", "Новинка"])
+    for series, name, opt, ret, unit in pdf_rows:
+        w.writerow([series, name, opt, ret, unit, "", ""])
+    if pdf_date:
+        w.writerow(["#обновлено", pdf_date, "", "", "", "", ""])
+    (data / "prices.csv").write_text(buf.getvalue(), encoding="utf-8")
+    print(f"Прайс из {pdf.name}: {len(pdf_rows)} позиций, цены на {pdf_date}")
+else:
+    print("PDF «Прайс*.pdf» не найден, прайс собирается из site/data/prices.csv", file=sys.stderr)
+
 text = (data / "prices.csv").read_text(encoding="utf-8-sig")
 (data / "prices.js").write_text(
     "// Создаётся автоматически из prices.csv скриптом обновить-прайс.py. Не редактируйте вручную.\n"

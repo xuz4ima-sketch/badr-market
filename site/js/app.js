@@ -196,6 +196,11 @@
         ? el("a", { class: "market", href: url, target: "_blank", rel: "noopener" }, ...body)
         : el("div", { class: "market is-soon" }, ...body));
     }));
+
+    const footLinks = MARKETS.map((m) => ({ name: m.name, url: webUrl(links[m.key]) })).filter((m) => m.url);
+    $("#foot-markets").replaceChildren(...footLinks.map((m) =>
+      el("li", null, el("a", { href: m.url, target: "_blank", rel: "noopener", text: m.name }))));
+    $("#foot-markets").hidden = !footLinks.length;
   }
 
   /* ---------- Books: gallery and full-size viewer ---------- */
@@ -353,6 +358,9 @@
 
   /* ---------- Init ---------- */
 
+  // Blocks stay hidden until setupMotion reveals them, so it runs first:
+  // an error in any later step must not leave the page empty.
+  setupMotion();
   setupContacts();
   setupBuy();
   setupBooks();
@@ -389,7 +397,6 @@
   }
 
   bindEvents();
-  setupMotion();
   setupDock();
   loadPrices();
 })();

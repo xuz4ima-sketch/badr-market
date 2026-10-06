@@ -859,6 +859,8 @@ h1 {
   color: var(--soft);
 }
 .foot-inner p { margin: 0; }
+.foot-markets { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; padding: 0; list-style: none; }
+.foot-markets[hidden] { display: none; }
 .foot-inner p:last-child { margin-left: auto; }
 .foot-inner a { text-decoration: none; }
 @media (hover: hover) {

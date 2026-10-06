@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Oswald:wght@600;700&display=swap">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=dev">
   <script>document.documentElement.classList.add("js")</script>
 
   <script type="application/ld+json">
@@ -38,7 +38,12 @@
     "description": "Издательский дом: исламская литература для взрослых и детей, опт и розница.",
     "url": "https://badr.market/",
     "logo": "https://badr.market/assets/icon-512.png",
-    "image": "https://badr.market/assets/og-image.png"
+    "image": "https://badr.market/assets/og-image.png",
+    "sameAs": [
+      "https://www.wildberries.ru/seller/293356",
+      "https://www.ozon.ru/seller/badr/knigi-16500/",
+      "https://www.avito.ru/brands/i142712173"
+    ]
   }
   </script>
 </head>
@@ -80,7 +85,7 @@
     <div class="hero-text">
       <h1 class="h1-anim" aria-label="Книги, которые меняют сердца!"><span class="w" aria-hidden="true"><span>Книги,</span></span> <span class="w" aria-hidden="true"><span>которые</span></span> <span class="w" aria-hidden="true"><span>меняют</span></span> <span class="w" aria-hidden="true"><span class="accent">сердца!</span></span></h1>
       <p class="lead">Исламская литература для взрослых и&nbsp;детей&nbsp;— оптом и&nbsp;в&nbsp;розницу.</p>
-      <p class="hero-stat" id="hero-stat">701 позиция в&nbsp;13 сериях с&nbsp;оптовыми и&nbsp;розничными ценами.</p>
+      <p class="hero-stat" id="hero-stat">281 позиция в&nbsp;13 сериях с&nbsp;оптовыми и&nbsp;розничными ценами.</p>
       <div class="actions">
         <a class="btn btn-primary" href="data/badr-price.xlsx" download="Прайс BadrBook.xlsx"><svg class="i" aria-hidden="true"><use href="#i-download"/></svg>Скачать прайс</a>
         <a class="btn btn-secondary" href="#contacts">Связаться</a>
@@ -102,7 +107,7 @@
           <div class="prose about-text" id="about-text" data-reveal hidden></div>
         </div>
         <dl class="stats" data-reveal>
-          <div><dt>книг и&nbsp;товаров в&nbsp;прайсе</dt><dd id="stat-books">700+</dd></div>
+          <div><dt>книг и&nbsp;товаров в&nbsp;прайсе</dt><dd id="stat-books">280+</dd></div>
           <div><dt>направлений литературы</dt><dd>11</dd></div>
           <div><dt>собственные серии</dt><dd>4</dd></div>
           <div><dt>городов с&nbsp;нашими книгами</dt><dd id="stat-cities">6</dd></div>
@@ -287,6 +292,7 @@
   <div class="wrap foot-inner">
     <img src="assets/logo-header.png" alt="" width="144" height="32">
     <p>© <span id="year">2026</span> Издательский Дом «BadrBook»</p>
+    <ul class="foot-markets" id="foot-markets" aria-label="Мы на маркетплейсах" hidden></ul>
     <p><a href="https://badr.market/">badr.market</a></p>
   </div>
 </footer>
@@ -317,8 +323,8 @@
   <svg class="i" aria-hidden="true"><use href="#i-arrow-up"/></svg>
 </button>
 
-<script src="js/config.js"></script>
-<script src="data/prices.js"></script>
-<script src="js/app.js"></script>
+<script src="js/config.js?v=dev"></script>
+<script src="data/prices.js?v=dev"></script>
+<script src="js/app.js?v=dev"></script>
 </body>
 </html>
