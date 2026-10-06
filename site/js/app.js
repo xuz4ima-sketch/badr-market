@@ -126,6 +126,8 @@
       const href = contactLinks[a.dataset.contact];
       a.hidden = !href;
       if (href) a.href = href;
+      // WhatsApp opens with the message from data-text already typed in
+      if (href && a.dataset.text && a.dataset.contact === "whatsapp") a.href += "?text=" + encodeURIComponent(a.dataset.text);
     });
     const value = document.querySelector("[data-contact-value]");
     if (value && CONTACTS.phone) value.textContent = CONTACTS.phone.trim();
