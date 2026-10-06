@@ -106,19 +106,6 @@
       <h2 id="about-title" data-reveal>О&nbsp;нас</h2>
       <div class="prose about-text" id="about-text" data-reveal hidden></div>
 
-      <div class="books" data-reveal>
-        <h3 class="books-title" id="books-title">Книги, которые уже стали любимыми</h3>
-        <ul class="books-grid" id="books-grid" aria-labelledby="books-title">
-          <li><button type="button" class="book"><img src="assets/favorites/sady-blagochestivyh.webp" alt="Сады благочестивых" width="800" height="800" loading="lazy" decoding="async"></button></li>
-          <li><button type="button" class="book"><img src="assets/favorites/kniga-o-tawhide.webp" alt="Книга о Таухиде" width="800" height="800" loading="lazy" decoding="async"></button></li>
-          <li><button type="button" class="book"><img src="assets/favorites/kladez-mudrosti.webp" alt="Кладезь мудрости" width="800" height="800" loading="lazy" decoding="async"></button></li>
-          <li><button type="button" class="book"><img src="assets/favorites/shamil.webp" alt="Великие люди Ислама: Шамиль" width="800" height="800" loading="lazy" decoding="async"></button></li>
-          <li><button type="button" class="book"><img src="assets/favorites/nachni-s-sebya.webp" alt="Начни с себя!" width="800" height="800" loading="lazy" decoding="async"></button></li>
-          <li><button type="button" class="book"><img src="assets/favorites/halid-ibn-al-valid.webp" alt="Меч Аллаха. Халид ибн аль-Валид" width="800" height="800" loading="lazy" decoding="async"></button></li>
-        </ul>
-        <p class="books-motto">Их читают. Их рекомендуют. Их&nbsp;дарят.</p>
-      </div>
-
       <!-- Books of the series: shown in the viewer by the «Смотреть книги» buttons in «Наши серии» -->
       <template id="series-books">
         <img data-series="great" src="assets/books/shamil.webp" alt="Великие люди Ислама: Шамиль" width="720" height="960">
@@ -135,6 +122,21 @@
         <img data-series="keys" src="assets/books/100-voprosov-po-edinobozhiyu.webp" alt="100 вопросов и ответов по единобожию" width="720" height="894">
         <img data-series="keys" src="assets/books/100-hadisov-pro-eto.webp" alt="100 хадисов про это…" width="720" height="894">
       </template>
+    </div>
+  </section>
+
+  <section class="sec light books" id="favorites" aria-labelledby="books-title">
+    <div class="wrap">
+      <h2 class="books-title" id="books-title" data-reveal>Книги, которые уже стали любимыми</h2>
+      <ul class="books-grid" id="books-grid" aria-labelledby="books-title" data-reveal>
+        <li><button type="button" class="book"><img src="assets/favorites/sady-blagochestivyh.webp" alt="Сады благочестивых" width="800" height="800" loading="lazy" decoding="async"></button></li>
+        <li><button type="button" class="book"><img src="assets/favorites/kniga-o-tawhide.webp" alt="Книга о Таухиде" width="800" height="800" loading="lazy" decoding="async"></button></li>
+        <li><button type="button" class="book"><img src="assets/favorites/kladez-mudrosti.webp" alt="Кладезь мудрости" width="800" height="800" loading="lazy" decoding="async"></button></li>
+        <li><button type="button" class="book"><img src="assets/favorites/shamil.webp" alt="Великие люди Ислама: Шамиль" width="800" height="800" loading="lazy" decoding="async"></button></li>
+        <li><button type="button" class="book"><img src="assets/favorites/nachni-s-sebya.webp" alt="Начни с себя!" width="800" height="800" loading="lazy" decoding="async"></button></li>
+        <li><button type="button" class="book"><img src="assets/favorites/halid-ibn-al-valid.webp" alt="Меч Аллаха. Халид ибн аль-Валид" width="800" height="800" loading="lazy" decoding="async"></button></li>
+      </ul>
+      <p class="books-motto" data-reveal>Их читают. Их рекомендуют. Их&nbsp;дарят.</p>
     </div>
   </section>
 
