@@ -76,7 +76,8 @@ if found:
         w.writerow([series, name, opt, ret, unit, "", ""])
     if pdf_date:
         w.writerow(["#обновлено", pdf_date, "", "", "", "", ""])
-    (data / "prices.csv").write_text(buf.getvalue(), encoding="utf-8")
+    with open(data / "prices.csv", "w", encoding="utf-8", newline="") as f:  # одинаковые переводы строк на Windows и в GitHub
+        f.write(buf.getvalue())
     print(f"Прайс из {pdf.name}: {len(pdf_rows)} позиций, цены на {pdf_date}")
 else:
     print("PDF «Прайс*.pdf» не найден, прайс собирается из site/data/prices.csv", file=sys.stderr)
