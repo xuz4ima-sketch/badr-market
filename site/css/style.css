@@ -587,6 +587,29 @@ h1 {
   text-align: center;
 }
 
+/* Coming soon: a short announcement with the channels to follow */
+
+.soon { text-align: center; }
+.soon-title {
+  font-size: clamp(40px, 7vw, 84px);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+/* Same moonlight underline as «сердца!» in the hero */
+.soon-mark { position: relative; display: inline-block; }
+.soon-mark::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0.3em;
+  bottom: -0.06em;
+  height: 0.06em;
+  border-radius: 0.04em;
+  background: linear-gradient(90deg, var(--moon), var(--moon-2));
+}
+.soon .lead { margin: 22px auto 0; color: var(--soft); font-size: clamp(19px, 2vw, 24px); }
+.soon .contact-row { justify-content: center; }
+
 /* Products: the subjects the house publishes in */
 
 .products .lead { margin-top: 16px; color: var(--soft); }
@@ -801,9 +824,6 @@ h1 {
 .btn-contact { min-width: 180px; }
 .contact-value { font-weight: 400; font-variant-numeric: tabular-nums; }
 
-.social { margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--rule); }
-.social .contact-row { margin-top: 16px; }
-
 .contacts-empty { margin-top: 32px; color: var(--soft); }
 
 @media (max-width: 640px) {
@@ -812,7 +832,9 @@ h1 {
 
 /* Footer */
 
-.foot { --bg: var(--night-3); border-top: 1px solid var(--rule); }
+.foot { border-top: 1px solid var(--rule); }
+/* The logo is white artwork: darken it on the white footer */
+.foot.light img { filter: brightness(0); opacity: 0.85; }
 .foot-inner {
   display: flex;
   flex-wrap: wrap;

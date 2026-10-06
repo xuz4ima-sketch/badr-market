@@ -134,7 +134,7 @@
     const social = ["telegramChannel", "instagram", "youtube"].some((k) => contactLinks[k]);
     $("#contact-main").hidden = !main;
     $("#contact-social").hidden = !social;
-    $("#contacts-empty").hidden = main || social;
+    $("#contacts-empty").hidden = main;
   }
 
   // **жирный** → <strong>
