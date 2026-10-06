@@ -539,38 +539,7 @@ h1 {
 
 /* About */
 
-.about-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-  gap: 56px;
-  align-items: start;
-}
-.about-text { margin-top: 28px; font-size: 17px; }
-@media (min-width: 900px) {
-  .about .stats { position: sticky; top: 120px; margin-top: 100px; }
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin: 0;
-  border-top: 2px solid var(--fg);
-}
-.stats > div {
-  display: flex;
-  flex-direction: column-reverse;
-  justify-content: flex-end;
-  padding: 20px 0 18px;
-  border-bottom: 1px solid var(--rule);
-}
-.stats > div:nth-child(odd) { padding-right: 16px; border-right: 1px solid var(--rule); }
-.stats > div:nth-child(even) { padding-left: 24px; }
-.stats dd { margin: 0; font: 700 clamp(40px, 4.6vw, 56px)/1 var(--font-display); font-variant-numeric: tabular-nums; }
-.stats dt { margin-top: 8px; color: var(--soft); font-size: 14px; line-height: 1.35; }
-
-@media (max-width: 899px) {
-  .about-grid { grid-template-columns: 1fr; gap: 36px; }
-}
+.about-text { max-width: 62em; margin-top: 28px; font-size: 17px; }
 
 /* Book gallery: a swipeable shelf of covers */
 

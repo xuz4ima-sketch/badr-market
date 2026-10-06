@@ -195,8 +195,6 @@
         : el("div", { class: "city-card" }, ...body));
     }));
     $("#stores-block").hidden = !stores.length;
-    $("#stat-cities").textContent = String(stores.length);
-    $("#stat-cities").parentElement.hidden = !stores.length;
 
     const links = CFG.marketplaces || {};
     $("#markets").replaceChildren(...MARKETS.map((m) => {
@@ -319,7 +317,6 @@
     const items = `${n} ${plural(n, ["позиция", "позиции", "позиций"])}`;
     $("#hero-stat").textContent =
       `${items} в ${sc} ${sc % 10 === 1 && sc % 100 !== 11 ? "серии" : "сериях"} с оптовыми и розничными ценами.`;
-    $("#stat-books").textContent = String(n);
     $("#price-count").textContent = " · " + items;
     const dateEl = $("#price-date");
     dateEl.hidden = !data.date;
