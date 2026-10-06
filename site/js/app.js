@@ -137,9 +137,24 @@
     $("#contacts-empty").hidden = main || social;
   }
 
+  // **жирный** → <strong>
+  function inline(s) {
+    return s.split(/\*\*(.+?)\*\*/).map((part, i) => (i % 2 ? el("strong", { text: part }) : part));
+  }
+
+  // Абзац «## Заголовок» → подзаголовок, строки «- пункт» → список, остальное → абзац.
+  function block(p) {
+    if (p.startsWith("## ")) return el("h3", {}, ...inline(p.slice(3).trim()));
+    const lines = p.split("\n").map((l) => l.trim());
+    if (lines.every((l) => /^[-•]\s/.test(l))) {
+      return el("ul", {}, ...lines.map((l) => el("li", {}, ...inline(l.slice(2).trim()))));
+    }
+    return el("p", {}, ...inline(lines.join(" ")));
+  }
+
   function fillText(targetSel, text) {
     const paras = String(text || "").split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
-    $(targetSel).replaceChildren(...paras.map((p) => el("p", { text: p })));
+    $(targetSel).replaceChildren(...paras.map(block));
     $(targetSel).hidden = !paras.length;
     return paras.length > 0;
   }

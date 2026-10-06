@@ -128,6 +128,11 @@ h3 {
 .prose { max-width: 42em; }
 .prose p { margin: 0 0 1em; }
 .prose p:last-child { margin-bottom: 0; }
+.prose h3 { margin: 1.8em 0 0.6em; font-family: var(--font-display); font-size: 24px; letter-spacing: 0.01em; }
+.prose ul { margin: 0 0 1em; padding-left: 1.2em; }
+.prose li { margin-bottom: 0.35em; }
+.prose li::marker { color: var(--accent); }
+.prose strong { font-weight: 700; }
 
 /* Buttons: pills. Primary glows like moonlight, secondary is frosted glass. */
 
@@ -538,9 +543,12 @@ h1 {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
   gap: 56px;
-  align-items: end;
+  align-items: start;
 }
 .about-text { margin-top: 28px; font-size: 17px; }
+@media (min-width: 900px) {
+  .about .stats { position: sticky; top: 120px; margin-top: 100px; }
+}
 
 .stats {
   display: grid;
