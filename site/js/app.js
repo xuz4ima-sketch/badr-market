@@ -332,19 +332,6 @@
     }
   }
 
-  /* ---------- Contact dock ---------- */
-
-  function setupDock() {
-    $("#dock").hidden = !["phone", "whatsapp", "telegram"].some((k) => contactLinks[k]);
-    updateDockSpace();
-  }
-
-  function updateDockSpace() {
-    const dockEl = $("#dock");
-    const h = !dockEl.hidden ? dockEl.offsetHeight : 0;
-    document.documentElement.style.setProperty("--dock-h", h + "px");
-  }
-
   /* ---------- Events ---------- */
 
   function bindEvents() {
@@ -357,7 +344,26 @@
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
 
-    window.addEventListener("resize", updateDockSpace, { passive: true });
+  }
+
+  /* ---------- Mobile menu ---------- */
+
+  function setupMenu() {
+    const btn = $("#menu-btn");
+    const topbar = $(".topbar");
+    const setOpen = (open) => {
+      topbar.classList.toggle("is-open", open);
+      btn.setAttribute("aria-expanded", String(open));
+      btn.setAttribute("aria-label", open ? "Закрыть меню" : "Меню");
+    };
+    btn.addEventListener("click", () => setOpen(!topbar.classList.contains("is-open")));
+    // A tap on a section closes the menu; the browser then scrolls to it
+    $("#nav").addEventListener("click", (e) => { if (e.target.closest("a")) setOpen(false); });
+    document.addEventListener("click", (e) => { if (!topbar.contains(e.target)) setOpen(false); });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && topbar.classList.contains("is-open")) { setOpen(false); btn.focus(); }
+    });
+    window.matchMedia("(min-width: 768px)").addEventListener("change", () => setOpen(false));
   }
 
   /* ---------- Init ---------- */
@@ -401,6 +407,6 @@
   }
 
   bindEvents();
-  setupDock();
+  setupMenu();
   loadPrices();
 })();

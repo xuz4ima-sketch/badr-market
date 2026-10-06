@@ -71,13 +71,19 @@
     <a class="brand" href="#top" aria-label="Издательский Дом «BadrBook» — в начало страницы">
       <img src="assets/logo-header.png" alt="" width="180" height="40">
     </a>
-    <nav class="nav" aria-label="Разделы">
+    <button type="button" class="menu-btn" id="menu-btn" aria-label="Меню" aria-expanded="false" aria-controls="nav">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" id="nav" aria-label="Разделы">
       <a href="#about">О нас</a>
+      <a class="nav-m" href="#favorites">Любимые книги</a>
+      <a class="nav-m" href="#soon">Новинки</a>
       <a href="#products">Продукция</a>
       <a href="#our-series">Серии</a>
       <a href="#price">Прайс</a>
       <a href="#buy">Где купить</a>
       <a href="#partners">Партнёрам</a>
+      <a class="nav-m" href="#faq">Вопросы</a>
       <a href="#contacts">Связь</a>
     </nav>
   </div>
@@ -351,12 +357,6 @@
     <p><a href="https://badr.market/">badr.market</a></p>
   </div>
 </footer>
-
-<nav class="dock" id="dock" aria-label="Быстрая связь" hidden>
-  <a data-contact="phone" hidden><svg class="i" aria-hidden="true"><use href="#i-phone"/></svg><span>Позвонить</span></a>
-  <a data-contact="whatsapp" target="_blank" rel="noopener" hidden><svg class="i" aria-hidden="true"><use href="#i-whatsapp"/></svg><span>WhatsApp</span></a>
-  <a data-contact="telegram" target="_blank" rel="noopener" hidden><svg class="i" aria-hidden="true"><use href="#i-telegram"/></svg><span>Telegram</span></a>
-</nav>
 
 <dialog class="viewer" id="viewer" aria-labelledby="viewer-cap">
   <figure class="viewer-fig">
