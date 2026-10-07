@@ -281,11 +281,14 @@
   }
 
   function setupBooks() {
-    const favorites = [...$("#books-grid").querySelectorAll(".book")].map((button) => {
-      const img = button.querySelector("img");
-      return { button, src: img.getAttribute("src"), alt: img.alt };
+    // Each grid («любимые», «Скоро!») is its own gallery in the viewer.
+    document.querySelectorAll(".books-grid").forEach((grid) => {
+      const books = [...grid.querySelectorAll(".book")].map((button) => {
+        const img = button.querySelector("img");
+        return { button, src: img.getAttribute("src"), alt: img.alt };
+      });
+      books.forEach((item, i) => item.button.addEventListener("click", () => openViewer(books, i, item.button)));
     });
-    favorites.forEach((item, i) => item.button.addEventListener("click", () => openViewer(favorites, i, item.button)));
 
     const seriesBooks = [...$("#series-books").content.querySelectorAll("img")].map((img) => (
       { src: img.getAttribute("src"), alt: img.alt, series: img.dataset.series }
