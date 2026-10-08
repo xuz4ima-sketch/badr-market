@@ -979,21 +979,26 @@ h1 {
 @media (hover: hover) {
   .faq-list summary:hover { color: var(--accent); }
 }
-.faq-list details p {
+.faq-a {
   max-width: 42em;
-  margin: -6px 0 0;
+  margin-top: -6px;
   padding: 0 48px 24px 0;
   color: var(--soft);
   font-size: 16px;
 }
-.faq-list details[open] p { animation: fade-up 300ms var(--ease) both; }
+.faq-a p, .faq-a ul { margin: 0; }
+.faq-a > :not(:first-child) { margin-top: 12px; }
+.faq-a ul { padding-left: 1.25em; }
+.faq-a li + li { margin-top: 4px; }
+.faq-a strong { color: var(--fg); font-weight: 600; }
+.faq-list details[open] .faq-a { animation: fade-up 300ms var(--ease) both; }
 .faq-list details a { color: var(--fg); font-weight: 600; text-underline-offset: 3px; }
 
 @media (max-width: 640px) {
   .faq-list { margin-top: 28px; }
   .faq-list summary { padding: 18px 36px 18px 0; }
   .faq-list summary::before, .faq-list summary::after { right: 4px; }
-  .faq-list details p { padding-right: 0; padding-bottom: 20px; }
+  .faq-a { padding-right: 0; padding-bottom: 20px; }
 }
 
 /* Contacts */

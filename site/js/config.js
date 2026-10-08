@@ -2,13 +2,15 @@
 window.BADR_CONFIG = {
   contacts: {
     // Телефон в любом формате, например "+7 928 123-45-67"
-    phone: "+7 922 359-15-00",
+    phone: "+7 928 673-60-60",
     // Номер WhatsApp в любом формате (можно тот же, что и телефон)
-    whatsapp: "+7 922 359-15-00",
+    whatsapp: "+7 928 673-60-60",
     // Telegram: юзернейм без @ (например "badrbook") или номер телефона в формате "+79223591500"
-    telegram: "+79223591500",
+    telegram: "+79286736060",
+    // Почта для связи, например "badrtv@gmail.com"
+    email: "badrtv@gmail.com",
     // Telegram-канал: юзернейм без @, например "badrbook"
-    telegramChannel: "",
+    telegramChannel: "badrbook313",
     // Instagram: юзернейм без @, например "badr.book"
     instagram: "",
     // YouTube-канал: ссылка целиком

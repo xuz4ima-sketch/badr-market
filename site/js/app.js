@@ -116,6 +116,7 @@
     phone: CONTACTS.phone && digits(CONTACTS.phone) ? "tel:+" + digits(CONTACTS.phone) : null,
     whatsapp: CONTACTS.whatsapp && digits(CONTACTS.whatsapp) ? "https://wa.me/" + digits(CONTACTS.whatsapp) : null,
     telegram: handle(CONTACTS.telegram) ? "https://t.me/" + handle(CONTACTS.telegram) : null,
+    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(CONTACTS.email || "").trim()) ? "mailto:" + String(CONTACTS.email).trim() : null,
     telegramChannel: handle(CONTACTS.telegramChannel) ? "https://t.me/" + handle(CONTACTS.telegramChannel) : null,
     youtube: webUrl(CONTACTS.youtube),
     instagram: handle(CONTACTS.instagram) ? "https://instagram.com/" + handle(CONTACTS.instagram) + "/" : null,
@@ -129,10 +130,11 @@
       // WhatsApp opens with the message from data-text already typed in
       if (href && a.dataset.text && a.dataset.contact === "whatsapp") a.href += "?text=" + encodeURIComponent(a.dataset.text);
     });
-    const value = document.querySelector("[data-contact-value]");
-    if (value && CONTACTS.phone) value.textContent = CONTACTS.phone.trim();
+    document.querySelectorAll("[data-contact-value]").forEach((v) => {
+      v.textContent = String(CONTACTS[v.dataset.contactValue] || "").trim();
+    });
 
-    const main = ["phone", "whatsapp", "telegram"].some((k) => contactLinks[k]);
+    const main = ["phone", "whatsapp", "telegram", "email"].some((k) => contactLinks[k]);
     const social = ["telegramChannel", "instagram", "youtube"].some((k) => contactLinks[k]);
     $("#contact-main").hidden = !main;
     $("#contact-social").hidden = !social;
