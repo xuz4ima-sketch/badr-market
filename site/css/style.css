@@ -18,6 +18,9 @@
   --tg: #229ed9;
   --ig: #e4405f;
   --yt: #ff0033;
+  --vk: #0077ff;
+  --ok: #ee8208;
+  --fb: #1877f2;
 
   --font-display: "Oswald", "Arial Narrow", sans-serif;
   --font-text: "Montserrat", "Segoe UI", Arial, sans-serif;
@@ -227,9 +230,15 @@ h3 {
 .btn-tg { --glow: var(--tg); }
 .btn-ig { --glow: var(--ig); }
 .btn-yt { --glow: var(--yt); }
+.btn-vk { --glow: var(--vk); }
+.btn-ok { --glow: var(--ok); }
+.btn-fb { --glow: var(--fb); }
 .btn-contact.btn-wa .i { background: linear-gradient(135deg, #5ef08d, #1faf54); color: #fff; }
 .btn-contact.btn-tg .i { background: linear-gradient(135deg, #4cc3f5, #1c86c8); color: #fff; }
 .btn-contact.btn-yt .i { background: linear-gradient(135deg, #ff4d4d, #e00000); color: #fff; }
+.btn-contact.btn-vk .i { background: linear-gradient(135deg, #3d9bff, #0057d9); color: #fff; }
+.btn-contact.btn-ok .i { background: linear-gradient(135deg, #ffa84a, #e06a00); color: #fff; }
+.btn-contact.btn-fb .i { background: linear-gradient(135deg, #4a9bff, #1259c9); color: #fff; }
 .btn-contact.btn-ig .i { background: linear-gradient(45deg, #f9a93b, #e4405f 45%, #a23ccf); color: #fff; }
 @media (hover: hover) {
   .btn-contact:hover { box-shadow: 0 14px 34px -16px var(--glow); }
@@ -237,6 +246,9 @@ h3 {
   .btn-contact.btn-tg:hover { border-color: var(--tg); }
   .btn-contact.btn-ig:hover { border-color: var(--ig); }
   .btn-contact.btn-yt:hover { border-color: var(--yt); }
+  .btn-contact.btn-vk:hover { border-color: var(--vk); }
+  .btn-contact.btn-ok:hover { border-color: var(--ok); }
+  .btn-contact.btn-fb:hover { border-color: var(--fb); }
 }
 
 .btn:disabled, .btn[aria-disabled="true"] { opacity: 0.4; cursor: not-allowed; }
@@ -817,7 +829,7 @@ h1 {
 }
 .city-card {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 14px;
   min-height: 72px;
   padding: 12px 0;
@@ -834,10 +846,52 @@ h1 {
 }
 .city-text, .market-text { display: flex; flex-direction: column; min-width: 0; }
 .city { font-weight: 600; font-size: 17px; }
+.city-name { font-weight: 500; font-size: 15px; }
 .city-addr { color: var(--soft); font-size: 14px; }
+.city-phone { font-size: 14px; }
+.city-phone a, .city-map { color: var(--accent); text-decoration: none; }
+.city-map { font-size: 14px; width: fit-content; }
+.phone-note { margin-left: 6px; color: var(--soft); font-size: 13px; }
 @media (hover: hover) {
-  a.city-card:hover .city { text-decoration: underline; text-underline-offset: 4px; }
+  .city-phone a:hover, .city-map:hover { text-decoration: underline; text-underline-offset: 3px; }
 }
+
+/* Несколько магазинов в одном городе: общая плашка с нумерованным списком */
+.city-group { grid-column: 1 / -1; padding: 12px 0 4px; border-bottom: 1px solid var(--rule); }
+.group-head { display: flex; align-items: center; gap: 14px; }
+.group-head .i {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  padding: 9px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--accent);
+}
+.group-count { margin-left: auto; color: var(--soft); font-size: 14px; white-space: nowrap; }
+.shops { list-style: none; margin: 10px 0 0 52px; padding: 0; }
+.shop {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: 14px;
+  padding: 14px 0;
+  border-top: 1px solid var(--rule);
+}
+.shop-num {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+.shop-main, .shop-phones { display: flex; flex-direction: column; min-width: 0; }
+.shop-phones { align-items: flex-end; gap: 2px; padding-top: 4px; text-align: right; }
+.shop-main .city-name { font-size: 16px; }
 
 .markets {
   list-style: none;
@@ -881,6 +935,13 @@ h1 {
   .city-card { gap: 10px; }
   .city-card .i { width: 32px; height: 32px; padding: 7px; }
   .city { font-size: 15px; }
+  .group-head .i { width: 32px; height: 32px; padding: 7px; }
+  .shops { margin-left: 0; }
+}
+@media (max-width: 560px) {
+  .cities { grid-template-columns: 1fr; }
+  .shop { grid-template-columns: 28px minmax(0, 1fr); row-gap: 6px; }
+  .shop-phones { grid-column: 2; align-items: flex-start; text-align: left; padding-top: 0; }
 }
 
 /* Partners: who the house works with, and how to get the wholesale catalog */
@@ -944,6 +1005,14 @@ h1 {
   .partners-list { grid-template-columns: minmax(0, 1fr); }
   .partners-list li { padding: 14px 16px; font-size: 16px; overflow-wrap: break-word; hyphens: auto; }
 }
+
+/* Strategic partnership: text comes from config.js */
+
+.strategic-empty { margin: 20px 0 0; color: var(--soft); }
+
+/* Media and social networks */
+
+.media .lead { margin-top: 16px; max-width: 36em; color: var(--soft); }
 
 /* FAQ: native <details> accordion */
 

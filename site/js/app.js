@@ -120,6 +120,9 @@
     telegramChannel: handle(CONTACTS.telegramChannel) ? "https://t.me/" + handle(CONTACTS.telegramChannel) : null,
     youtube: webUrl(CONTACTS.youtube),
     instagram: handle(CONTACTS.instagram) ? "https://instagram.com/" + handle(CONTACTS.instagram) + "/" : null,
+    vk: webUrl(CONTACTS.vk),
+    ok: webUrl(CONTACTS.ok),
+    facebook: webUrl(CONTACTS.facebook),
   };
 
   function setupContacts() {
@@ -135,9 +138,10 @@
     });
 
     const main = ["phone", "whatsapp", "telegram", "email"].some((k) => contactLinks[k]);
-    const social = ["telegramChannel", "instagram", "youtube"].some((k) => contactLinks[k]);
+    const social = ["telegramChannel", "instagram", "youtube", "vk", "ok", "facebook"].some((k) => contactLinks[k]);
     $("#contact-main").hidden = !main;
     $("#contact-social").hidden = !social;
+    $("#media").hidden = !social;
     $("#contacts-empty").hidden = main;
   }
 
@@ -185,18 +189,59 @@
   function setupBuy() {
     const stores = (Array.isArray(CFG.stores) ? CFG.stores : [])
       .filter((st) => st && String(st.city || "").trim());
-    $("#cities").replaceChildren(...stores.map((st) => {
-      const address = String(st.address || "").trim();
-      const map = webUrl(st.map);
-      const body = [
-        icon("map-pin"),
-        el("span", { class: "city-text" },
-          el("span", { class: "city", text: String(st.city).trim() }),
-          address ? el("span", { class: "city-addr", text: address }) : null),
-      ];
-      return el("li", null, map
-        ? el("a", { class: "city-card", href: map, target: "_blank", rel: "noopener" }, ...body)
-        : el("div", { class: "city-card" }, ...body));
+    const text = (v) => String(v || "").trim();
+
+    // Телефон «+7 988 428-00-66 (WhatsApp)»: номер — ссылка, пометка в скобках — серым рядом.
+    const phoneLinks = (st) => (Array.isArray(st.phones) ? st.phones : [])
+      .map((p) => {
+        const m = text(p).match(/^(.*?)\s*\((.*)\)$/);
+        const num = m ? m[1] : text(p);
+        return digits(num)
+          ? el("span", { class: "city-phone" },
+              el("a", { href: "tel:+" + digits(num), text: num }),
+              m ? el("span", { class: "phone-note", text: m[2] }) : null)
+          : null;
+      });
+    const mapLink = (st) => webUrl(st.map)
+      ? el("a", { class: "city-map", href: webUrl(st.map), target: "_blank", rel: "noopener", text: "На карте" })
+      : null;
+    const line = (cls, v) => text(v) ? el("span", { class: cls, text: text(v) }) : null;
+
+    // Магазины одного города собираем вместе, в порядке из config.js.
+    const groups = new Map();
+    for (const st of stores) {
+      const key = text(st.city);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(st);
+    }
+
+    $("#cities").replaceChildren(...[...groups].map(([city, shops]) => {
+      if (shops.length === 1) {
+        const st = shops[0];
+        return el("li", null, el("div", { class: "city-card" },
+          icon("map-pin"),
+          el("span", { class: "city-text" },
+            el("span", { class: "city", text: city }),
+            line("city-name", st.name),
+            line("city-addr", st.address),
+            line("city-addr", st.hours),
+            ...phoneLinks(st),
+            mapLink(st))));
+      }
+      return el("li", { class: "city-group" },
+        el("div", { class: "group-head" },
+          icon("map-pin"),
+          el("span", { class: "city", text: city }),
+          el("span", { class: "group-count", text: `${shops.length} ${plural(shops.length, ["магазин", "магазина", "магазинов"])}` })),
+        el("ol", { class: "shops" }, ...shops.map((st, i) =>
+          el("li", { class: "shop" },
+            el("span", { class: "shop-num", text: String(i + 1) }),
+            el("span", { class: "shop-main" },
+              line("city-name", st.name),
+              line("city-addr", st.address),
+              line("city-addr", st.hours),
+              mapLink(st)),
+            el("span", { class: "shop-phones" }, ...phoneLinks(st))))));
     }));
     $("#stores-block").hidden = !stores.length;
 
@@ -381,6 +426,7 @@
   setupBooks();
   setupViewer();
   fillText("#about-text", CFG.about);
+  $("#strategic-empty").hidden = fillText("#strategic-text", CFG.strategicPartnership);
   $("#terms").hidden = !fillText("#terms-text", CFG.wholesaleTerms);
   $("#year").textContent = String(new Date().getFullYear());
   function setupMotion() {
