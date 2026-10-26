@@ -1,5 +1,5 @@
-# Пересобирает прайс сайта из PDF-файла «Прайс на ДД.ММ.ГГ.pdf» в корне проекта.
-# Если PDF несколько, берётся тот, у которого дата «Цены указаны на …» самая свежая.
+# Пересобирает прайс сайта из PDF-прайса (выгрузка из 1С) в корне проекта. Имя файла может быть любым:
+# прайсом считается PDF со строкой «Цены указаны на …». Если таких несколько, берётся тот, где дата самая свежая.
 # Что создаётся:
 #   site/data/prices.csv        — прайс в виде таблицы (читает сайт и этот скрипт);
 #   site/data/prices.js         — копия прайса, чтобы он открывался даже при запуске index.html двойным щелчком;
@@ -56,9 +56,20 @@ def pdf_to_rows(path):
     return date, out
 
 
+def is_price_pdf(path):
+    """Прайс узнаём по строке «Цены указаны на» внутри, а не по имени файла: владелец может загрузить его под любым именем."""
+    import pymupdf
+    try:
+        return "Цены указаны на" in "".join(p.get_text() for p in pymupdf.open(path))
+    except Exception:
+        return False
+
+
 def newest_pdf():
     best = None
-    for path in base.glob("Прайс*.pdf"):
+    for path in base.glob("*.pdf"):
+        if not is_price_pdf(path):
+            continue
         date, rows = pdf_to_rows(path)
         key = tuple(reversed(date.split("."))) if date else ()
         if rows and (best is None or key > best[0]):
@@ -69,6 +80,11 @@ def newest_pdf():
 found = newest_pdf()
 if found:
     _, pdf, pdf_date, pdf_rows = found
+    # Если PDF выгружен в другом формате и разобрался плохо, лучше оставить старый прайс, чем опубликовать пустой.
+    old = sum(1 for r in csv.reader(open(data / "prices.csv", encoding="utf-8-sig")) if any(r) and not r[0].startswith("#")) - 1
+    if len(pdf_rows) < max(10, old // 2):
+        sys.exit(f"ОШИБКА: в {pdf.name} нашлось только {len(pdf_rows)} позиций (в текущем прайсе {old}). "
+                 "Похоже, формат PDF изменился. Прайс на сайте не обновлён.")
     buf = io.StringIO(newline="")
     w = csv.writer(buf, lineterminator="\n")
     w.writerow(["Серия", "Наименование", "Опт", "Розница", "Ед.", "Наличие", "Новинка"])
@@ -80,7 +96,7 @@ if found:
         f.write(buf.getvalue())
     print(f"Прайс из {pdf.name}: {len(pdf_rows)} позиций, цены на {pdf_date}")
 else:
-    print("PDF «Прайс*.pdf» не найден, прайс собирается из site/data/prices.csv", file=sys.stderr)
+    print("PDF с прайсом не найден, прайс собирается из site/data/prices.csv", file=sys.stderr)
 
 text = (data / "prices.csv").read_text(encoding="utf-8-sig")
 (data / "prices.js").write_text(

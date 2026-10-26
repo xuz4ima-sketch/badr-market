@@ -328,7 +328,48 @@
   }
 
   function setupBooks() {
-    // Each grid («любимые», «Скоро!») is its own gallery in the viewer.
+    // «Наша продукция»: a section opens like the FAQ and shows its books in a grid;
+    // a section without books yet stays a plain row. Books with data-sub go into
+    // subsections of their section, each opening the same way.
+    const categoryBooks = [...$("#category-books").content.querySelectorAll("img")];
+    const row = (title, count, ...body) => el("details", null,
+      el("summary", null,
+        el("span", { class: "cat-title", text: title }),
+        el("span", { class: "cat-count", text: count }),
+        el("span", { class: "cat-toggle", "aria-hidden": "true" })),
+      ...body);
+    const grid = (imgs) => {
+      const list = el("ul", { class: "books-grid cat-books" }, ...imgs.map((img) => {
+        const cover = img.cloneNode();
+        cover.loading = "lazy";
+        cover.decoding = "async";
+        return el("li", null, el("button", { type: "button", class: "book" }, cover));
+      }));
+      // Pictures of one shape (e.g. postcards) keep it instead of the usual cover crop.
+      const ratios = new Set(imgs.map((img) => `${img.getAttribute("width")}/${img.getAttribute("height")}`));
+      if (ratios.size === 1) list.style.setProperty("--cover-ratio", [...ratios][0].replace("/", " / "));
+      return list;
+    };
+    document.querySelectorAll(".cats > li[data-category]").forEach((li) => {
+      const imgs = categoryBooks.filter((img) => img.dataset.category === li.dataset.category);
+      if (!imgs.length) return;
+      const title = li.textContent.trim();
+      const subs = [...new Set(imgs.map((img) => img.dataset.sub).filter(Boolean))];
+      if (!subs.length) {
+        li.replaceChildren(row(title, `${imgs.length} ${plural(imgs.length, ["книга", "книги", "книг"])}`, grid(imgs)));
+      } else {
+        const loose = imgs.filter((img) => !img.dataset.sub);
+        li.replaceChildren(row(title, `${subs.length} ${plural(subs.length, ["подраздел", "подраздела", "подразделов"])}`,
+          el("ul", { class: "cat-subs" }, ...subs.map((sub) => {
+            const items = imgs.filter((img) => img.dataset.sub === sub);
+            return el("li", null, row(sub, `${items.length} ${plural(items.length, ["позиция", "позиции", "позиций"])}`, grid(items)));
+          })),
+          loose.length && grid(loose)));
+      }
+      li.classList.add("has-books");
+    });
+
+    // Each grid («любимые», «Скоро!», a section of «Наша продукция») is its own gallery in the viewer.
     document.querySelectorAll(".books-grid").forEach((grid) => {
       const books = [...grid.querySelectorAll(".book")].map((button) => {
         const img = button.querySelector("img");
