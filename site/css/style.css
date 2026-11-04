@@ -688,6 +688,8 @@ h1 {
 .soon .lead { margin: 22px auto 0; color: var(--soft); font-size: clamp(19px, 2vw, 24px); }
 .soon .contact-row { justify-content: center; }
 .soon-grid { margin: clamp(28px, 4vw, 44px) 0 clamp(28px, 4vw, 40px); }
+/* Promo posters keep their tall shape instead of the square cover crop */
+.soon-grid .book.is-poster { aspect-ratio: 3 / 4; }
 
 /* Products: the subjects the house publishes in */
 
